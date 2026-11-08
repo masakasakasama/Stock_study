@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>Market Logic</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="How news moves stock prices, explained with real past cases and diagrams.">
+<meta name="theme-color" content="#0f172a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7fb;--card:#ffffff;--fg:#0f172a;--muted:#5b6478;--line:#e3e6ee;--grid:#eceef4;
+  --a:#2f6bff;--b:#e0780f;--c:#14a37f;--down:#e0414d;--soft:#eef3ff;--chip:#ffffff;
+  --at:#2155d6;--bt:#b45309;--ct:#0b7a5c;--downt:#c62833;--mt:#5b6478;
+  --pa:#2f5fe0;--pb:#c2410c;--pc:#0b7a5c;--pdown:#c8323c;--pm:#5b6478;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1020;--card:#141a2e;--fg:#e8ecf6;--muted:#9aa4bd;--line:#252d47;--grid:#1e2540;
+  --a:#6f9bff;--b:#ffa64d;--c:#37c99f;--down:#ff6b75;--soft:#1a2340;--chip:#141a2e;
+  --at:#8fb2ff;--bt:#ffb366;--ct:#4fd8ae;--downt:#ff8a92;--mt:#9aa4bd;
+  --pa:#2f5fe0;--pb:#c2410c;--pc:#0b7a5c;--pdown:#c8323c;--pm:#4a5368;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0b1020;--card:#141a2e;--fg:#e8ecf6;--muted:#9aa4bd;--line:#252d47;--grid:#1e2540;
+  --a:#6f9bff;--b:#ffa64d;--c:#37c99f;--down:#ff6b75;--soft:#1a2340;--chip:#141a2e;
+  --at:#8fb2ff;--bt:#ffb366;--ct:#4fd8ae;--downt:#ff8a92;--mt:#9aa4bd;
+  --pa:#2f5fe0;--pb:#c2410c;--pc:#0b7a5c;--pdown:#c8323c;--pm:#4a5368;color-scheme:dark;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.75;font-size:16px;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+header.hero{padding:44px 0 28px;background:linear-gradient(160deg,#0f172a 0%,#1e3a8a 100%);color:#fff}
+.hero .kicker{font-size:12px;letter-spacing:.15em;opacity:.8}
+.hero h1{font-size:30px;line-height:1.3;margin:6px 0 10px;font-weight:900}
+.hero p{margin:0;opacity:.9;font-size:15px}
+.hero .meta{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.hero .meta span{font-size:12px;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:99px}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;gap:8px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+nav.toc .wrap::-webkit-scrollbar{display:none}
+nav.toc a{flex:0 0 auto;font-size:13px;text-decoration:none;color:var(--fg);background:var(--chip);border:1px solid var(--line);padding:5px 12px;border-radius:99px;white-space:nowrap}
+nav.toc a.on{background:var(--pa);border-color:var(--pa);color:#fff}
+section{padding:28px 0 8px}
+.ch{font-size:12px;font-weight:700;color:var(--at);letter-spacing:.1em}
+h2{font-size:23px;line-height:1.4;margin:4px 0 12px;font-weight:900}
+h3{font-size:17px;margin:22px 0 6px}
+.lead{background:var(--soft);border-left:4px solid var(--a);padding:12px 14px;border-radius:0 10px 10px 0;font-weight:700;margin:10px 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card .t{font-weight:700;font-size:15px;margin-bottom:2px}
+.card .s{font-size:12px;color:var(--muted);margin-bottom:8px}
+.src{font-size:11px;color:var(--muted);margin-top:6px}
+svg{width:100%;height:auto;display:block;overflow:visible}
+svg text{font-family:"Noto Sans JP",system-ui,sans-serif}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:10px 0}
+.steps li{counter-increment:s;position:relative;padding:0 0 12px 40px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;background:var(--pa);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
+.kpi b{display:block;font-size:20px;font-weight:900;line-height:1.2}
+.kpi span{font-size:11px;color:var(--muted)}
+.down{color:var(--downt)}.up{color:var(--ct)}
+.ctrl{margin:12px 0 4px}
+.ctrl label{display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+.ctrl label output{color:var(--at)}
+input[type=range]{width:100%;accent-color:var(--a);height:28px}
+.formula{font-size:18px;font-weight:900;text-align:center;padding:14px 8px;background:var(--soft);border-radius:12px;margin:10px 0}
+.formula small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.big{font-size:30px;font-weight:900;color:var(--at);text-align:center;margin:4px 0}
+.quiz{border:1px dashed var(--a)}
+.quiz button{width:100%;text-align:left;font:inherit;font-size:14px;padding:10px 12px;margin:6px 0;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.quiz button.ok{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card))}
+.quiz button.ng{border-color:var(--down);background:color-mix(in srgb,var(--down) 10%,var(--card))}
+.quiz .ans{display:none;font-size:14px;margin-top:8px}
+.quiz.done .ans{display:block}
+.check{list-style:none;padding:0;margin:0}
+.check li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.check li:last-child{border-bottom:0}
+.check .ic{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:900;color:#fff}
+.check b{display:block;font-size:15px}
+.check span{font-size:13px;color:var(--muted)}
+.weekly .empty{font-size:14px;color:var(--muted)}
+.wk h4{margin:0 0 4px;font-size:16px}
+.wk .date{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--at);margin-right:4px;font-weight:700}
+footer{padding:30px 0 50px;font-size:12px;color:var(--muted)}
+.fl{display:inline-block;width:21px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;background-size:100% 100%;box-shadow:0 0 0 1px var(--line);flex:0 0 auto}
+.fl.us{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2019%2013%27%3E%3Crect%20width%3D%2719%27%20height%3D%2713%27%20fill%3D%27%23b22234%27/%3E%3Cpath%20d%3D%27M0%201.5h19M0%204.5h19M0%207.5h19M0%2010.5h19%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271%27/%3E%3Crect%20width%3D%278%27%20height%3D%277%27%20fill%3D%27%233c3b6e%27/%3E%3C/svg%3E")}
+.fl.jp{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%203%202%27%3E%3Crect%20width%3D%273%27%20height%3D%272%27%20fill%3D%27%23fff%27/%3E%3Ccircle%20cx%3D%271.5%27%20cy%3D%271%27%20r%3D%27.6%27%20fill%3D%27%23bc002d%27/%3E%3C/svg%3E")}
+.fl.ua{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%203%202%27%3E%3Crect%20width%3D%273%27%20height%3D%271%27%20fill%3D%27%230057b7%27/%3E%3Crect%20y%3D%271%27%20width%3D%273%27%20height%3D%271%27%20fill%3D%27%23ffd700%27/%3E%3C/svg%3E")}
+.fl.ru{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%209%206%27%3E%3Crect%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%23fff%27/%3E%3Crect%20y%3D%272%27%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%230039a6%27/%3E%3Crect%20y%3D%274%27%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%23d52b1e%27/%3E%3C/svg%3E")}
+.fl.cn{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2030%2020%27%3E%3Crect%20width%3D%2730%27%20height%3D%2720%27%20fill%3D%27%23de2910%27/%3E%3Cpath%20d%3D%27M5%202.5l1.18%203.62h3.8l-3.07%202.24%201.17%203.62L5%209.74l-3.08%202.24%201.17-3.62L0%206.12h3.82z%27%20fill%3D%27%23ffde00%27/%3E%3C/svg%3E")}
+.fl.world{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2016%27%3E%3Crect%20width%3D%2724%27%20height%3D%2716%27%20fill%3D%27%232f6bff%27/%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%278%27%20r%3D%276%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271.2%27/%3E%3Cpath%20d%3D%27M6%208h12M12%202c-2.5%203-2.5%209%200%2012M12%202c2.5%203%202.5%209%200%2012%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271%27/%3E%3C/svg%3E")}
+.lv{display:inline-block;white-space:nowrap;flex:0 0 auto;font-size:11px;font-weight:900;padding:1px 8px;border-radius:99px;color:#fff;margin-right:6px}
+.lvl{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px;font-size:13px}
+.lvl li{display:flex;gap:6px;align-items:baseline}
+details.sec>summary{list-style:none;cursor:pointer;position:relative;padding-right:34px}
+details.sec>summary::-webkit-details-marker,details.sub>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:"";position:absolute;right:6px;top:30px;width:10px;height:10px;border-right:2.5px solid var(--a);border-bottom:2.5px solid var(--a);transform:rotate(45deg);transition:transform .2s}
+details.sec[open]>summary::after{transform:rotate(-135deg);top:36px}
+details.sec>summary .lead{margin-bottom:6px}
+details.sec:not([open])>summary .tap{display:inline-block}
+.tap{display:none;font-size:12px;color:var(--at);font-weight:700;margin:0 0 4px}
+details.sub>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:6px;position:relative;padding-right:22px}
+details.sub>summary::after{content:"+";position:absolute;right:0;top:0;font-weight:900;color:var(--at)}
+details.sub[open]>summary::after{content:"−"}
+.st{font-weight:900;font-size:15px;display:inline-flex;align-items:center;min-width:0}
+.rank{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--pa);color:#fff;font-weight:900;font-size:13px;display:grid;place-items:center}
+.dt{flex:0 0 auto;font-size:11px;font-weight:900;background:var(--fg);color:var(--bg);padding:2px 8px;border-radius:6px}
+.now{font-size:14px;margin:10px 0 0}
+.ax{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;margin:10px 0 0;font-size:14px}
+.ax dt{font-size:11px;font-weight:900;color:var(--at);padding-top:3px;white-space:nowrap}
+.ax dd{margin:0;min-width:0}
+.warn{font-size:13px;background:color-mix(in srgb,var(--b) 14%,var(--card));border:1px solid color-mix(in srgb,var(--b) 40%,var(--line));border-radius:10px;padding:8px 12px;margin:0 0 10px}
+.prob{display:flex;height:14px;border-radius:8px;overflow:hidden;font-size:11px;font-weight:900;margin-top:4px}
+.prob span{display:flex;align-items:center;padding:0 8px;white-space:nowrap}
+.theme-btn{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:6;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+
+/* Slightly larger text for phone screens. */
+@media (max-width: 600px) {
+  body { font-size: 17px; }
+  .hero p, .card .t, .st { font-size: 16px; }
+  nav.toc a, .ctrl label, .check span, .lvl, .warn { font-size: 14px; }
+  .card .s, .legend, .formula small, .wk .date, footer,
+  .hero .kicker, .hero .meta span, .ch, .tap { font-size: 13px; }
+  .src, .kpi span, .tag, .lv, .dt, .ax dt { font-size: 12px; }
+  .quiz button, .quiz .ans, .weekly .empty, .now, .ax { font-size: 15px; }
+  main p[style*="font-size:14px"] { font-size: 15px !important; }
+  main p[style*="font-size:13px"] { font-size: 14px !important; }
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">MARKET LOGIC · A visual guide to how markets work</div>
+  <h1>How does news<br>become a stock price?</h1>
+  <p>Only three forces move stock prices. With real past cases and charts, this guide connects each “why” in one line.</p>
+  <div class="meta"><span>8 chapters</span><span>About 20 min</span><span>Cases: 2008–2026</span></div>
+</div></header>
+
+<nav class="toc"><div class="wrap" id="toc">
+  <a href="#map">Map</a><a href="#c1">① What a price is</a><a href="#c2">② Rates</a><a href="#c3">③ Expectations</a><a href="#c4">④ Currency</a><a href="#c5">⑤ Fear</a><a href="#c6">⑥ Long run</a><a href="#c7">⑦ Weekly reading</a><a href="#c8">⑧ Events & trades</a><a href="#now">Now</a><a href="#next">Next</a><a href="#weekly">This week</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- MAP -->
+<section id="map"><details class="sec" open><summary>
+  <div class="ch">MAP</div>
+  <h2>The map: prices move on three levers</h2>
+  <div class="lead">Every piece of news reaches a stock price through one of three levers: ① earnings (the power to make money), ② interest rates (the price of money), ③ sentiment (fear of risk).</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <svg id="mapSvg" viewBox="0 0 340 300" role="img" aria-label="Diagram: news reaches the stock price through three paths"></svg>
+  </div>
+  <p>Every chapter uses this map. When you see a headline, ask “which lever does this move?” That is the first step to reading the market.</p>
+</details></section>
+
+<!-- C1 -->
+<section id="c1"><details class="sec"><summary>
+  <div class="ch">CHAPTER 1</div>
+  <h2>A price is “earnings × a multiple for expectations”</h2>
+  <div class="lead">Price = EPS (Earnings Per Share) × P/E (Price-to-Earnings ratio: how many years of earnings investors pay for). The price moves only when one of these two moves.</div><div class="tap">Tap to open</div></summary>
+  <div class="formula">Price = EPS × P/E<small>EPS = profit per share / P/E = the “multiple” the market pays for that profit</small></div>
+  <div class="card">
+    <div class="t">Try it: the same company, different prices</div>
+    <div class="s">EPS moves with the earnings lever; P/E moves with the rates and sentiment levers</div>
+    <div class="ctrl"><label>EPS (profit per share)<output id="epsO"></output></label><input id="eps" type="range" min="50" max="400" step="10" value="200"></div>
+    <div class="ctrl"><label>P/E (multiple)<output id="perO"></output></label><input id="per" type="range" min="5" max="40" step="1" value="15"></div>
+    <div class="big" id="priceO"></div>
+    <svg id="perSvg" viewBox="0 0 340 120"></svg>
+  </div>
+  <h3>Why the multiple changes for the same profit</h3>
+  <p>P/E measures how strongly investors believe the profits will last and grow. Low rates and a bright outlook push P/E up; high rates and fear push it down. In short,<b>EPS = today’s facts, P/E = the price of the future</b>. Most news shakes the P/E side.</p>
+</details></section>
+
+<!-- C2 -->
+<section id="c2"><details class="sec"><summary>
+  <div class="ch">CHAPTER 2 · RATES</div>
+  <h2>Why stocks fall when interest rates rise</h2>
+  <div class="lead">Future money is valued at a discount to today. Higher rates mean a steeper discount, so companies that earn far in the future fall the most.</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <div class="t">The principle: move the discount rate</div>
+    <div class="s">Both companies earn 1,000 over 10 years. The only difference is when</div>
+    <div class="legend"><span><i style="background:var(--c)"></i>Steady company: 100 every year</span><span><i style="background:var(--b)"></i>Growth company: 0 early, 200 later</span></div>
+    <svg id="cfSvg" viewBox="0 0 340 110"></svg>
+    <div class="ctrl"><label>Interest rate (discount rate)<output id="rO"></output></label><input id="r" type="range" min="0" max="8" step="0.25" value="1"></div>
+    <svg id="pvSvg" viewBox="0 0 340 120"></svg>
+    <div class="src">Value today = Σ cash flow ÷ (1 + rate)<sup>years</sup>. Compared with a 1% rate.</div>
+  </div>
+  <h3><i class="fl us"></i>Case: 2022, the Fed’s rapid hikes</h3>
+  <p>To fight 40-year-high inflation (US CPI = Consumer Price Index, 9.1% year on year in June), the Fed (Federal Reserve, the US central bank) raised its policy rate from 0.25% to 4.50% in one year. The S&amp;P 500 fell 19.4% for the year (S&amp;P 500 = Standard &amp; Poor's 500, an index of 500 major US companies). The tech-heavy Nasdaq, priced on future growth, fell 33.1%. Just as the simulation above shows: growth companies are the most sensitive to rates.</p>
+  <div class="kpis">
+    <div class="kpi"><b>+4.25<small>pt</small></b><span>Policy rate (upper bound)</span></div>
+    <div class="kpi"><b class="down">−19.4%</b><span>S&amp;P500</span></div>
+    <div class="kpi"><b class="down">−33.1%</b><span>Nasdaq Composite</span></div>
+  </div>
+  <div class="card">
+    <div class="t">Rate staircase and falling stocks (2022, month-end)</div>
+    <div class="s">Top: S&amp;P 500 / Bottom: FF rate (Federal Funds Rate, the US policy rate), upper bound (%)</div>
+    <svg id="y22a" viewBox="0 0 340 170"></svg>
+    <svg id="y22b" viewBox="0 0 340 110"></svg>
+    <div class="src">Source: S&amp;P Dow Jones Indices, Fed (month-end closes and targets)</div>
+  </div>
+  <div class="card quiz" data-ok="1">
+    <div class="t">Quick quiz</div>
+    <div class="s">A central bank says it will cut rates sooner than expected. Which is most likely to rise?</div>
+    <button>A. A power company paying steady dividends every year</button>
+    <button>B. A loss-making growth company expected to earn big in 10 years</button>
+    <div class="ans">The answer is <b>B</b>. When the discount weakens, profits far in the future recover the most value today (2022 in reverse).</div>
+  </div>
+</details></section>
+
+<!-- C3 -->
+<section id="c3"><details class="sec"><summary>
+  <div class="ch">CHAPTER 3 · EXPECTATIONS</div>
+  <h2>Prices move on the gap from expectations, not on results</h2>
+  <div class="lead">Even good news does not move a price if it was already expected (priced in). Only a surprise, a gap from expectations, moves it.</div><div class="tap">Tap to open</div></summary>
+  <h3><i class="fl us"></i>Case: Nvidia’s results, May 2023</h3>
+  <p>In the generative-AI boom, Nvidia guided next-quarter revenue to about $11 billion. Analysts expected about $7.1 billion. This guidance surprise, more than 50% above forecasts, sent the stock up 24% the next day. Its market value passed $1 trillion days later.</p>
+  <div class="card">
+    <div class="t">Next-quarter revenue (May–Jul 2023): forecast vs guidance vs actual</div>
+    <div class="s">US$ billions</div>
+    <svg id="nvBar" viewBox="0 0 340 140"></svg>
+    <svg id="nvPx" viewBox="0 0 340 150"></svg>
+    <div class="src">Source: Nvidia results (24 May and 23 Aug 2023); consensus as reported from Refinitiv. Prices are pre-split closes.</div>
+  </div>
+  <h3>The reverse: “great results, falling stock”</h3>
+  <p>Even record profits send a stock down if the market expected more. The question is not “good or bad” but<b>“better or worse than expected”</b>. The line “versus forecasts of …” matters more than “record profit” in the headline.</p>
+  <div class="card">
+    <svg id="surSvg" viewBox="0 0 340 150" role="img" aria-label="Diagram: the gap between forecast and result sets the direction"></svg>
+  </div>
+</details></section>
+
+<!-- C4 -->
+<section id="c4"><details class="sec"><summary>
+  <div class="ch">CHAPTER 4 · CURRENCY</div>
+  <h2>A weak yen helps Japanese stocks, but not always</h2>
+  <div class="lead">Exporters earn in dollars and report in yen. When the yen weakens, the same dollar of sales becomes more yen, so earnings (EPS) rise.</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <div class="t"><i class="fl jp"></i>Toyota: operating profit and the dollar–yen rate</div>
+    <div class="s">Bars: operating profit (¥ trillion) / Labels: average USD/JPY for the year</div>
+    <svg id="tyBar" viewBox="0 0 340 170"></svg>
+    <div class="src">Source: Toyota results (fiscal years ending March). FX rates are approximate averages.</div>
+  </div>
+  <p>In the year to March 2024, Toyota became the first Japanese company to earn over ¥5 trillion in operating profit. But in the year to March 2023, profit<b>fell</b> even though the yen weakened, because costly materials and chip shortages outweighed the currency tailwind.<b>Currency is only one of the things that move earnings</b>. That is the accurate way to see it.</p>
+  <h3><i class="fl jp"></i>Case: 5 Aug 2024, Japan’s “Black Monday”</h3>
+  <p>On 31 July the Bank of Japan raised rates; on 2 August a weak US jobs report narrowed the expected rate gap between the US and Japan. The “yen carry trade”, borrowing cheap yen to buy higher-yielding assets, unwound all at once and the yen surged. The Nikkei fell 4,451 points (−12.4%) in one day, its largest point drop ever, beyond October 1987, then rebounded 3,217 points the next day, its largest point gain ever.</p>
+  <div class="card">
+    <div class="t">Nikkei and USD/JPY (Jul–Aug 2024)</div>
+    <div class="s">Top: Nikkei 225 (close, ¥) / Bottom: USD/JPY (approx.)</div>
+    <svg id="nkA" viewBox="0 0 340 170"></svg>
+    <svg id="nkB" viewBox="0 0 340 110"></svg>
+    <div class="src">Source: Nikkei Inc. (closes). USD/JPY is approximate, around Tokyo late afternoon.</div>
+  </div>
+  <div class="card">
+    <svg id="carrySvg" viewBox="0 0 340 210" role="img" aria-label="Diagram: the chain reaction of a yen carry-trade unwind"></svg>
+  </div>
+</details></section>
+
+<!-- C5 -->
+<section id="c5"><details class="sec"><summary>
+  <div class="ch">CHAPTER 5 · FEAR</div>
+  <h2>What decides how fast markets recover</h2>
+  <div class="lead">Crashes run through the sentiment lever. Recovery speed depended on whether the crisis was inside or outside the financial system, and how fast policy responded.</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <div class="t"><i class="fl us"></i>S&amp;P 500: fall from the previous high</div>
+    <div class="s">X-axis: calendar days from the high / line joins key closes</div>
+    <div class="legend"><span><i style="background:var(--down)"></i>Lehman crisis (Oct 2007 high)</span><span><i style="background:var(--a)"></i>COVID (Feb 2020 high)</span></div>
+    <svg id="ddSvg" viewBox="0 0 340 200"></svg>
+    <div class="src">Source: S&amp;P Dow Jones Indices (closes). Back to the high: Lehman about 5 years 5 months, COVID about 6 months.</div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b class="down">−56.8%</b><span>Lehman max fall</span></div>
+    <div class="kpi"><b class="down">−33.9%</b><span>COVID max fall</span></div>
+    <div class="kpi"><b>33 days</b><span>COVID to bottom</span></div>
+  </div>
+  <p><b>2008</b> broke the banks themselves and froze the flow of credit. It took time to see the full losses, and 17 months to reach the bottom.<b>2020</b> was a shock from outside. Within weeks the Fed cut to zero, offered unlimited liquidity, and governments spent heavily. The fall was fast, but both the rates and sentiment levers were pulled back at once, so the recovery was a record too.</p>
+</details></section>
+
+<!-- C6 -->
+<section id="c6"><details class="sec"><summary>
+  <div class="ch">CHAPTER 6 · LONG RUN</div>
+  <h2>Same price, completely different substance</h2>
+  <div class="lead">The Nikkei took 34 years to beat its 1989 high, in 2024. But P/E was about 60 in 1989 and about 16 in 2024. Same price, very different earnings behind it.</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <div class="t"><i class="fl jp"></i>The Nikkei’s long journey (1989–2024)</div>
+    <div class="s">Year-end closes and major lows</div>
+    <svg id="lgSvg" viewBox="0 0 340 190"></svg>
+    <div class="src">Source: Nikkei Inc. P/E is approximate, as reported at the time.</div>
+  </div>
+  <div class="card">
+    <div class="t">Broken down with the Chapter 1 formula</div>
+    <svg id="decSvg" viewBox="0 0 340 130"></svg>
+  </div>
+  <p>The 1989 high was built by an inflated P/E (expectations). The 2024 high was backed by growing EPS (earnings).<b>To judge whether stocks are expensive, split the price into EPS and P/E, not the price itself.</b> That is why the Chapter 1 formula is worth remembering.</p>
+</details></section>
+
+<!-- C7 -->
+<section id="c7"><details class="sec"><summary>
+  <div class="ch">CHAPTER 7 · PRACTICE</div>
+  <h2>Four checks for reading the weekly news</h2>
+  <div class="lead">For any headline, ask in this order. This alone explains most moves.</div><div class="tap">Tap to open</div></summary>
+  <div class="card">
+    <ul class="check">
+      <li><div class="ic" style="background:var(--pa)">R</div><div><b>Will rates rise or fall?</b><span>CPI, jobs report, Fed/BOJ meetings → P/E moves (Ch. 2)</span></div></li>
+      <li><div class="ic" style="background:var(--pc)">E</div><div><b>Did profit forecasts change?</b><span>Results and guidance → EPS moves; the gap from forecasts matters (Ch. 3)</span></div></li>
+      <li><div class="ic" style="background:var(--pb)">¥</div><div><b>Stronger or weaker yen?</b><span>Driven by the US–Japan rate gap → exporters’ EPS moves (Ch. 4)</span></div></li>
+      <li><div class="ic" style="background:var(--pdown)">S</div><div><b>Is the market scared?</b><span>VIX (Volatility Index, the “fear gauge”) and chain selling → P/E shrinks for a while (Ch. 5)</span></div></li>
+    </ul>
+  </div>
+  <ol class="steps">
+    <li><b>The event</b> in one line (e.g. US CPI beat forecasts)</li>
+    <li><b>Which lever</b> it moves (rates ↑ → P/E ↓)</li>
+    <li><b>The gap from forecasts</b> (if as expected, the move is small)</li>
+    <li><b>The actual move</b> and check (if it differs, look for another cause)</li>
+  </ol>
+</details></section>
+
+<!-- WEEKLY -->
+<!-- C8 -->
+<section id="c8"><details class="sec"><summary>
+  <div class="ch">CHAPTER 8 · CHECKING REAL TRADES</div>
+  <h2>After an event, when should you have bought, and what?</h2>
+  <div class="lead">You can’t predict the event itself, but timing after an event has repeatable clues. We keep the perfect trade in hindsight separate from what was actually possible at the time.</div><div class="tap">Tap to open</div></summary>
+
+  <h3><i class="fl us"></i>Case 0: US midterm elections, November 2026</h3>
+  <p>In the 3 November midterms, Democrats won both chambers of Congress, leaving the Trump administration facing a divided government. Polls had favored Democrats (about 8 points on the national ballot; one forecast gave Democrats 80% for the House and 57% for the Senate). On the 4th, as results came in, the S&amp;P 500 rose 1.6% and the Dow 3%, the biggest post-midterm gain in 44 years. Trump’s conciliatory tone and an 8.6% drop in Brent oil on hopes the Iran war would end helped. But on the 5th the S&amp;P 500 fell 4.4%, its worst day since April 2025, as AI chip stocks sold off and a semiconductor ETF (Exchange Traded Fund) fell more than 12% in one day.</p>
+  <div class="card">
+    <div class="t">S&amp;P 500 daily closes (30 Oct – 6 Nov 2026)</div>
+    <div class="s">Dotted line: record close of 7,818.93 on 6 Oct</div>
+    <svg id="mt26" viewBox="0 0 340 190"></svg>
+    <div class="src">Source: AP (daily index closes), TheStreet (4 and 6 Nov), Edgex (record high).</div>
+  </div>
+  <div class="card">
+    <div class="t">Not just the S&amp;P 500: what you held changed the result</div>
+    <div class="s">One day, 5 Nov (Nikkei: the next day, 6 Nov). Gain or loss per $1,000</div>
+    <svg id="mtAsset1" viewBox="0 0 340 248"></svg>
+    <div class="s" style="margin-top:8px">Four days, 3 → 6 Nov (Nikkei 2 → 6 Nov). Per $1,000</div>
+    <svg id="mtAsset2" viewBox="0 0 340 208"></svg>
+    <ul class="lvl" style="margin-top:10px">
+      <li><span class="lv" style="background:var(--pa)">Index</span>S&amp;P 500: eMAXIS Slim US Stock (S&amp;P 500) or VOO. Nasdaq: QQQ. Dow: DIA. World: MSCI ACWI, tracked by the “All Country” funds. Chips: SOXX. Nikkei: Nikkei 225 ETFs</li>
+      <li><span class="lv" style="background:var(--pc)">Spread</span>On the same day, holders concentrated in chips lost about 4 times as much as world-stock holders. The broader the fund, the more one industry’s shock is diluted</li>
+      <li><span class="lv" style="background:var(--pb)">FX</span>Investors in Japan value US stocks in yen. Over these 4 days USD/JPY barely moved (158.73 → 158.48), so the yen loss was almost the same</li>
+    </ul>
+    <div class="src">Source: AP, CNBC (US indices), Reuters (MSCI ACWI −3.1%), magnikki (Nikkei), Gaitame.com (USD/JPY). Chip ETF estimated from reports of “more than 12%”.</div>
+  </div>
+  <div class="card">
+    <div class="t">Diagram: holding $1,000, sell half on the up day, buy back on the down day</div>
+    <div class="s">Units = how much S&amp;P 500 you hold (start = 100). The goal is more units, not more cash</div>
+    <svg id="mtUnits" viewBox="0 0 340 250"></svg>
+    <div class="src">Calculated from S&amp;P 500 closes (3 Nov 7,568.92 · 4 Nov 7,688.62 · 5 Nov 7,353.73 · 6 Nov 7,376.86). Excludes fees, taxes and FX.</div>
+  </div>
+  <div class="card">
+    <div class="t">Same $1,000, different moves (as of 6 Nov)</div>
+    <div class="s">Start: $1,000 held at the 3 Nov (election day) close. Dow and Nasdaq from the same close</div>
+    <svg id="mtLad" viewBox="0 0 340 248"></svg>
+    <div class="s" style="margin-top:8px">Adding a separate $1,000 along the way (as of 6 Nov)</div>
+    <svg id="mtLad2" viewBox="0 0 340 88"></svg>
+    <ul class="lvl">
+      <li><span class="lv" style="background:var(--pa)">Best</span>Hitting both the sell day and the buy day. The direction was readable, but the exact days only in hindsight</li>
+      <li><span class="lv" style="background:var(--pb)">Foresaw</span>Decidable at the time from public information (polls, party policies)</li>
+      <li><span class="lv" style="background:var(--pc)">Skilled</span>Possible at the time if you set the rule (“if X, then Y”) before buying</li>
+      <li><span class="lv" style="background:var(--pm)">Typical</span>Do nothing. Anyone can</li>
+      <li><span class="lv" style="background:var(--pdown)">Mistake</span>Common panic moves made while watching prices</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="t">Why “Foresaw”: the direction was visible in advance</div>
+    <p style="font-size:14px;margin:6px 0">Polls favored Democrats. The Trump administration backed AI investment, while pushback against data centers’ power use was already spreading in some states before the vote.<b>“Democrats win → headwind for AI stocks”</b> could be built from public information before the vote. In fact, from 3 to 6 Nov the AI-heavy Nasdaq fell 3.1% while the Dow fell 1.0%.</p>
+    <p style="font-size:14px;margin:6px 0">But on the 4th, when results came in, everything rose (the Nasdaq too, +1.4%), and AI stocks broke the next day.<b>The direction was readable; the timing was not</b>. So we separate “Best” (exact days) from “Foresaw” (direction only).</p>
+  </div>
+  <div class="card">
+    <div class="t">Could you really have judged it at the time?</div>
+    <ul class="check">
+      <li><div class="ic" style="background:var(--pc)">○</div><div><b>The result (a Democratic win)</b><span>Polls showed Democrats ahead. The House was nearly priced in; the Senate was close to a toss-up, so winning both removed the last doubt</span></div></li>
+      <li><div class="ic" style="background:var(--pb)">△</div><div><b>The next-day rally</b><span>“Stocks rise once results are known” and “divided government suits stocks” are past patterns. But part of the gain came from oil falling on White House remarks that day, which no one could know in advance</span></div></li>
+      <li><div class="ic" style="background:var(--pdown)">×</div><div><b>The drop two days later</b><span>Triggered by fears that a Democratic Congress and state opposition would slow data-center building, plus a Qualcomm sales miss. Linked to the election, but the timing and size were not readable from the result alone</span></div></li>
+    </ul>
+  </div>
+  <div class="lead" style="border-color:var(--b)">Lesson: you could catch the event rally, but holding on meant a loss two days later, and those who jumped in after the rise lost the most. For event trades, the key is to<b>decide when to sell before you buy</b>.</div>
+
+  <h3>The same check on past events</h3>
+  <p>We compare with one rule:<b>“Buy at the close on the day the event happened or policy was decided, and hold about one month”</b>. Not a perfect bottom; a trade that was possible on the day.</p>
+  <div class="card">
+    <div class="t">Buy $1,000 of the S&amp;P 500 right after the event, hold about a month</div>
+    <div class="s">Bar: gain or loss after about one month / grey: the worst paper loss along the way. Japan (Aug 2024) uses the Nikkei, in yen</div>
+    <svg id="evBars" viewBox="0 0 340 400"></svg>
+    <div class="src">Source: calculated from S&amp;P Dow Jones Indices and Nikkei Inc. closes. 2026 is in progress as of 6 Nov (2 trading days).</div>
+  </div>
+
+  <div class="card">
+    <div class="t">Buy signals for each event, and how readable they were</div>
+    <div class="s">More dots = easier to judge at the time (this page’s assessment, not data)</div>
+    <svg id="evGrid" viewBox="0 0 340 344"></svg>
+  </div>
+
+  <h3>Hindsight answer vs real-time judgment, event by event</h3>
+  <div class="card">
+    <div class="t"><i class="fl us"></i><i class="fl world"></i>2008 Lehman collapse: when “buy after the event” failed</div>
+    <div class="s">Buying at the 15 Sep close of 1,192.70 left 907.84 a month later on 15 Oct (−23.9%)</div>
+    <p style="font-size:14px;margin:6px 0">The bottom came six months later, 676.53 on 9 Mar 2009, 43% below the collapse-day close. The cause was inside the banks (the financial system itself), so neither earnings nor sentiment recovered until the full losses were known.<b>When an event is breaking the financial system, buying right after the crash is too early</b> (Ch. 5).</p>
+  </div>
+  <div class="card">
+    <div class="t"><i class="fl us"></i>2016 Trump win: the overnight crash was a buying chance</div>
+    <div class="s">During the count, Dow futures fell over 800 points and S&amp;P futures about 5%. The cash market closed up 1.1% the next day</div>
+    <p style="font-size:14px;margin:6px 0">Hindsight: buy the overnight futures drop. Real time: the promised tax cuts, deregulation and infrastructure spending were positive for earnings. The key was seeing the panic as a temporary move of the sentiment lever.</p>
+  </div>
+  <div class="card">
+    <div class="t"><i class="fl ru"></i><i class="fl ua"></i>2022 Russia invades Ukraine: invasion day was the short-term bottom</div>
+    <div class="s">On 24 Feb the S&amp;P 500 fell to 4,115 intraday, then closed up 1.5% (recovering about 4% within the day)</div>
+    <svg id="ukr" viewBox="0 0 340 170"></svg>
+    <div class="s" style="margin-top:10px">$1,000 held from the day before the invasion (23 Feb): as of 16 June</div>
+    <svg id="ladUkr" viewBox="0 0 340 186"></svg>
+    <p style="font-size:14px;margin:6px 0">Stocks had already fallen on fears of war, so the invasion day became a short-term bottom. Oil (WTI) rose 34% from $92 on 23 Feb to $124 on 8 Mar, but was back at $95 by 16 Mar.<b> But stocks fell again from late March and were lower still by June.</b> Inflation and Fed hikes (Ch. 2) were the bigger lever.</p>
+  </div>
+  <div class="card">
+    <div class="t"><i class="fl world"></i>2020 COVID: the buy signal was the central bank, not case counts</div>
+    <div class="s">The Fed announced unlimited QE on the morning of 23 Mar. That day’s close was the bottom</div>
+    <svg id="cov" viewBox="0 0 340 170"></svg>
+    <div class="s" style="margin-top:10px">$1,000 held from the pre-COVID high (19 Feb): as of 23 Apr</div>
+    <svg id="ladCov" viewBox="0 0 340 186"></svg>
+    <p style="font-size:14px;margin:6px 0">Case counts kept rising for months. Stocks bottomed the moment the Fed and government pulled the rates and money-supply levers as far as they would go.<b> Even with bad news continuing, stocks rise first once policy is set.</b> Buying when the WHO declared a pandemic on 11 Mar left you roughly flat a month later.</p>
+  </div>
+  <div class="card">
+    <div class="t"><i class="fl us"></i><i class="fl cn"></i>April 2025 Trump tariff shock: “VIX above 50” was the signal</div>
+    <div class="s">The S&amp;P 500 fell 12% in four trading days after the 2 Apr tariff announcement, then jumped 9.5% when a 90-day pause was announced on the 9th</div>
+    <svg id="tar" viewBox="0 0 340 170"></svg>
+    <div class="s" style="margin-top:10px">$1,000 held at the close of tariff day (2 Apr): as of 2 May</div>
+    <svg id="ladTar" viewBox="0 0 340 186"></svg>
+    <p style="font-size:14px;margin:6px 0">No one could predict the pause. But the VIX rarely tops 50, only in a few moments such as 2008 and 2020, and stocks were higher a year later each time.<b>Judging by how scared the market is, not by what will happen,</b> made this a buy you could actually take at the time.</p>
+  </div>
+
+  <div class="card">
+    <div class="t">How to read the ranks</div><ul class="lvl">
+      <li><span class="lv" style="background:var(--pa)">Best</span>Hitting both the sell day and the buy day. The direction was readable, but the exact days only in hindsight</li>
+      <li><span class="lv" style="background:var(--pb)">Foresaw</span>Decidable at the time from public information (polls, party policies)</li>
+      <li><span class="lv" style="background:var(--pc)">Skilled</span>Possible at the time if you set the rule (“if X, then Y”) before buying</li>
+      <li><span class="lv" style="background:var(--pm)">Typical</span>Do nothing. Anyone can</li>
+      <li><span class="lv" style="background:var(--pdown)">Mistake</span>Common panic moves made while watching prices</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="t">Summary: three signals to use after an event</div>
+    <ul class="check">
+      <li><div class="ic" style="background:var(--pa)">1</div><div><b>When uncertainty ends</b><span>A confirmed vote count, an invasion actually starting. Once “we don’t know what happens” ends, stocks tend to recover (2016, 2022, 2024, day one of 2026). The rebound can last only days</span></div></li>
+      <li><div class="ic" style="background:var(--pc)">2</div><div><b>When central banks or governments act</b><span>Rate cuts, liquidity, policy reversals. Often the bottom even while bad news continues (2020, 2025)</span></div></li>
+      <li><div class="ic" style="background:var(--pdown)">3</div><div><b>When fear overshoots</b><span>VIX above 40–50, record-size daily drops. Except when the financial system itself is broken, as in 2008 (Ch. 5)</span></div></li>
+    </ul>
+  </div>
+  <p style="font-size:13px;color:var(--muted)">* Every event here eventually recovered. The same rule also lost money at times (early 2008, late 2022). Past results do not guarantee future returns.</p>
+</details></section>
+
+<section id="now"><details class="sec"><summary>
+  <div class="ch">NOW · As of 8 November 2026</div>
+  <h2>Five things moving markets now</h2>
+  <div class="lead">In priority order. For each: which lever, what to watch, and what $1,000 did in similar past moments.</div><div class="tap">Tap to open</div></summary>
+  <div class="warn">From here on, these are learning hypotheses. They are not recommendations to buy or sell, and past moves do not guarantee the future.</div>
+  <details class="card sub"><summary><span class="rank">1</span><span class="st"><i class="fl us"></i><i class="fl jp"></i>AI and chip stock selloff</span><span class="tag" style="color:var(--ct)">Earnings</span><span class="tag" style="color:var(--downt)">Sentiment</span></summary>
+    <p class="now">On 5 Nov a US chip ETF fell more than 12% in a day and the Nasdaq sat 11.9% below its high. On the 6th the Nikkei fell 3,643 points (−5.96%), down 9.25% for the week to 57,434. Fears of slower data-center building met forced selling from margin calls.</p>
+    <dl class="ax"><dt>Watch</dt><dd>Do credit spreads and CDS (Credit Default Swaps, the cost of insuring against default) widen? If not, sentiment has overshot. If they do, the flow of money is starting to jam.</dd><dt>By asset</dt><dd>Chip ETF (SOXX) > Nasdaq (QQQ) > S&amp;P 500 > world stocks > Dow. The 5 Nov moves followed this order</dd><dt>Hypothesis</dt><dd>Don’t buy everything the day after a crash; buy in several steps. Stop buying if credit markets worsen.</dd></dl>
+    <div class="s" style="margin-top:8px">$1,000 in similar past moments</div>
+    <svg id="now0" viewBox="0 0 340 128"></svg>
+  </details>
+  <details class="card sub"><summary><span class="rank">2</span><span class="st"><i class="fl us"></i>US rate hikes resume</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <p class="now">The Fed hiked in September for the first time in about 3 years, to 3.75–4.00%. September CPI rose 3.7% year on year, above forecasts, and markets price a 70–80% chance of another hike in December (8–9).</p>
+    <dl class="ax"><dt>Watch</dt><dd>Is the 10 Nov CPI above or below forecasts? Higher raises hike odds and lowers P/E.</dd><dt>By asset</dt><dd>Growth-heavy Nasdaq (QQQ) is most rate-sensitive. In 2022 the Nasdaq fell 33%, the Dow 9%. Bond ETFs (e.g. TLT) also fall when rates rise</dd><dt>Hypothesis</dt><dd>Don’t add before CPI. Buy after seeing it come in below forecasts. Growth stocks are the most rate-sensitive (Ch. 2).</dd></dl>
+    <div class="s" style="margin-top:8px">$1,000 in similar past moments</div>
+    <svg id="now1" viewBox="0 0 340 128"></svg>
+  </details>
+  <details class="card sub"><summary><span class="rank">3</span><span class="st"><i class="fl us"></i><i class="fl world"></i>Iran war and oil</span><span class="tag" style="color:var(--downt)">Sentiment</span><span class="tag" style="color:var(--ct)">Earnings</span></summary>
+    <p class="now">The war that began on 28 Feb is past eight months, and Strait of Hormuz traffic is far below pre-war levels. Brent fell from about $118 on 30 Oct to about $93 on 5 Nov on ceasefire hopes, then returned to $98 on the 6th.</p>
+    <dl class="ax"><dt>Watch</dt><dd>Will ceasefire talks (mediated by Qatar) advance, or will strikes resume? Oil prices give the first answer.</dd><dt>By asset</dt><dd>Energy ETFs (XLE) move with oil; indices and airlines move the other way. In 2022 energy stocks rose 58% while the S&amp;P 500 fell 19%</dd><dt>Hypothesis</dt><dd>A ceasefire means cheaper oil → stocks up, energy down. Renewed strikes mean the reverse. Until it’s clear, don’t bet on one side.</dd></dl>
+    <div class="s" style="margin-top:8px">$1,000 in similar past moments</div>
+    <svg id="now2" viewBox="0 0 340 128"></svg>
+  </details>
+  <details class="card sub"><summary><span class="rank">4</span><span class="st"><i class="fl us"></i>Divided US Congress</span><span class="tag" style="color:var(--ct)">Earnings</span><span class="tag" style="color:var(--downt)">Sentiment</span></summary>
+    <p class="now">Democrats won both chambers. Budgets and tax cuts get harder, and stronger state-level opposition to data centers weighs on AI stocks.</p>
+    <dl class="ax"><dt>Watch</dt><dd>Do data-center rules or construction pauses become real bills or state decisions? Words, or action?</dd><dt>By asset</dt><dd>The impact concentrates in AI infrastructure (chips, power, data centers). Broad world funds and the Dow dilute it</dd><dt>Hypothesis</dt><dd>Divided government is not always bad for stocks (+1.6% on the 4th). The impact is concentrated in AI infrastructure, so think about it separately from the whole index.</dd></dl>
+    <div class="s" style="margin-top:8px">$1,000 in similar past moments</div>
+    <svg id="now3" viewBox="0 0 340 128"></svg>
+  </details>
+  <details class="card sub"><summary><span class="rank">5</span><span class="st"><i class="fl jp"></i>BOJ’s December hike and a ¥158 dollar</span><span class="tag" style="color:var(--bt)">FX</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <p class="now">The BOJ policy rate is 1.25%. Markets price about a 63% chance of a hike at the 18 Dec meeting. USD/JPY is around 158, close to the 160 level where Japan intervened in 2024.</p>
+    <dl class="ax"><dt>Watch</dt><dd>If the BOJ hikes while US data weakens, the rate gap narrows and the yen can surge. Watch for the same mix as August 2024.</dd><dt>By asset</dt><dd>Hits both Japanese stocks (Nikkei, TOPIX) and yen-based US stock funds. A stronger yen cuts their yen value even if US stocks don’t move</dd><dt>Hypothesis</dt><dd>If a stronger yen and falling stocks come together, separate a temporary currency move in exporters from a real fall in earnings.</dd></dl>
+    <div class="s" style="margin-top:8px">$1,000 in similar past moments</div>
+    <svg id="now4" viewBox="0 0 340 128"></svg>
+  </details>
+  <div class="src">Source: CNBC, AP, TheStreet (US stocks), magnikki, Gaitame.com (Nikkei, USD/JPY), Vizaca (FOMC, CPI), Gulf News (Iran, oil), Daiwa Institute of Research, MogWatch (BOJ).</div>
+</details></section>
+
+<section id="next"><details class="sec"><summary>
+  <div class="ch">NEXT · What comes next</div>
+  <h2>Five scheduled events, and five that may happen</h2>
+  <div class="lead">Scheduled events have known dates; prices move on the gap from forecasts. For events that may happen, set your signal in advance and act when it appears.</div><div class="tap">Tap to open</div></summary>
+  <h3>Scheduled events</h3>
+  <details class="card sub"><summary><span class="dt">11/10</span><span class="st"><i class="fl us"></i>US October CPI</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>The gap from forecasts. Above → December hike almost certain → P/E falls. Below → hopes of no hike → rebound.</dd><dt>Why</dt><dd>With hike odds already at 70–80%, an in-line number barely moves prices. Prices move when the forecast is wrong (Ch. 3).</dd><dt>By asset</dt><dd>If above forecast, the rate-sensitive Nasdaq and bond ETFs fall the most</dd><dt>Hypothesis</dt><dd>Wait before the release. Buying after confirming a lower number is more repeatable than guessing.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="sc0" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="dt">11/10–12</span><span class="st"><i class="fl jp"></i><i class="fl us"></i>AI earnings rush</span><span class="tag" style="color:var(--ct)">Earnings</span><span class="tag" style="color:var(--downt)">Sentiment</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Can SoftBank Group and CoreWeave (10 Nov), Applied Materials and Cisco (12 Nov) say AI investment will continue?</dd><dt>Why</dt><dd>The selloff came from shrinking expectations (P/E) that investment might stop. If company outlooks deny that, prices recover.</dd><dt>Hypothesis</dt><dd>Don’t jump on one good report. Decide when several companies point the same way.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="sc1" viewBox="0 0 340 48"></svg>
+  </details>
+  <details class="card sub"><summary><span class="dt">11/17</span><span class="st"><i class="fl us"></i>Nvidia results</span><span class="tag" style="color:var(--ct)">Earnings</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Revenue versus forecasts (about $109 billion) and next-quarter guidance. Comments on data-center demand.</dd><dt>Why</dt><dd>The center of the AI market. Beating forecasts is not enough; it comes down to by how much, and the guidance (Ch. 3).</dd><dt>By asset</dt><dd>Nvidia stock > chip ETF (SOXX) > Nasdaq > world stocks, from biggest reaction to smallest</dd><dt>Hypothesis</dt><dd>Don’t go all in before results. If you hold, set the size and add after seeing the next day’s reaction.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="sc2" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="dt">12/8–9</span><span class="st"><i class="fl us"></i>FOMC (US policy meeting)</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Will they hike, and signal more hikes in 2027?</dd><dt>Why</dt><dd>A hike is 70–80% priced in. The surprise would be a hold, or even tougher talk.</dd><dt>Hypothesis</dt><dd>Watch the statement and press conference on what comes next, more than the hike-day move.</dd></dl>
+    <div class="s" style="margin-top:8px">Odds: CME FedWatch (as of 5 Nov)</div><div class="prob"><span style="width:70.1%;background:var(--a)"></span><span style="width:29.9%;background:var(--grid)"></span></div><div class="legend" style="margin-top:4px"><span><i style="background:var(--a);height:8px;width:8px;border-radius:2px"></i>Hike 70.1%</span><span><i style="background:var(--grid);height:8px;width:8px;border-radius:2px"></i>Hold 29.9%</span></div>
+  </details>
+  <details class="card sub"><summary><span class="dt">12/18</span><span class="st"><i class="fl jp"></i>Bank of Japan policy meeting</span><span class="tag" style="color:var(--bt)">FX</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Will they raise 1.25% → 1.5%? If so, do they hint at more?</dd><dt>Why</dt><dd>A hike plus expected US cuts speeds up yen strength and pushes exporters down (August 2024).</dd><dt>By asset</dt><dd>A hike with a stronger yen hurts exporters and yen-based US stock funds; banks tend to gain from higher rates</dd><dt>Hypothesis</dt><dd>When US and Japan decisions and data land in the same week, holding less is also a choice.</dd></dl>
+    <div class="s" style="margin-top:8px">Odds: market pricing (as of 7 Nov)</div><div class="prob"><span style="width:62.8%;background:var(--a)"></span><span style="width:37.2%;background:var(--grid)"></span></div><div class="legend" style="margin-top:4px"><span><i style="background:var(--a);height:8px;width:8px;border-radius:2px"></i>Hike 62.8%</span><span><i style="background:var(--grid);height:8px;width:8px;border-radius:2px"></i>Hold 37.2%</span></div><div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="sc4" viewBox="0 0 340 48"></svg>
+  </details>
+  <h3>Things that may happen</h3>
+  <details class="card sub"><summary><span class="st"><i class="fl us"></i><i class="fl world"></i>US–Iran ceasefire deal</span><span class="tag" style="color:var(--downt)">Sentiment</span><span class="tag" style="color:var(--ct)">Earnings</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Talks restart via Qatar, Hormuz traffic recovers, oil falls below $90.</dd><dt>Why</dt><dd>Cheaper oil lowers inflation and hike pressure. Both the sentiment and rates levers push stocks up.</dd><dt>By asset</dt><dd>Energy ETFs (XLE) fall; airlines, transport and world stocks tend to rise</dd><dt>Hypothesis</dt><dd>On the day a deal sends oil sharply lower, consider cutting energy and favoring indices and airlines, whose fuel costs fall.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="mb0" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="st"><i class="fl us"></i><i class="fl world"></i>Iran strikes resume</span><span class="tag" style="color:var(--downt)">Sentiment</span><span class="tag" style="color:var(--at)">Rates</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Large US strikes, more attacks on ships in Hormuz, oil above $110.</dd><dt>Why</dt><dd>Oil up → inflation → hike expectations → P/E down. The same flow as 2022.</dd><dt>By asset</dt><dd>Energy ETFs (XLE) and gold tend to rise; Nasdaq and airlines tend to fall</dd><dt>Hypothesis</dt><dd>In 2022 the day of the attack itself became a short-term bottom. But if rates keep rising, stocks fall again.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="mb1" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="st"><i class="fl us"></i><i class="fl world"></i>AI selloff turns into a credit scare</span><span class="tag" style="color:var(--downt)">Sentiment</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Credit spreads and CDS widen fast; reports of bad data-center loans.</dd><dt>Why</dt><dd>When a stock problem becomes a lending problem, it turns into a 2008-style slow-recovery decline (Ch. 5).</dd><dt>Hypothesis</dt><dd>If this signal appears, stop buying because it fell. Raise cash and wait.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="mb2" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="st"><i class="fl jp"></i>Yen surge (carry-trade unwind)</span><span class="tag" style="color:var(--bt)">FX</span><span class="tag" style="color:var(--downt)">Sentiment</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>Do a BOJ hike and a weak US jobs report land close together? Does USD/JPY move more than ¥5 in a week?</dd><dt>Why</dt><dd>Money borrowed in yen rushes home: stronger yen → exporters fall → margin calls, a chain reaction (Ch. 4).</dd><dt>Hypothesis</dt><dd>In 2024 prices recovered from the day after the crash. The key was not panic-selling and buying in steps instead.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="mb3" viewBox="0 0 340 88"></svg>
+  </details>
+  <details class="card sub"><summary><span class="st"><i class="fl jp"></i>Government/BOJ currency intervention</span><span class="tag" style="color:var(--bt)">FX</span></summary>
+    <dl class="ax"><dt>Watch</dt><dd>USD/JPY nears ¥160 and officials step up verbal warnings.</dd><dt>Why</dt><dd>Intervention moves the yen sharply for hours, but rarely lasts while the rate gap remains (2022).</dd><dt>Hypothesis</dt><dd>Don’t panic-sell exporters on intervention day. Watch whether the effect fades within days.</dd></dl>
+    <div class="s" style="margin-top:8px">Similar past cases, per $1,000</div><svg id="mb4" viewBox="0 0 340 48"></svg>
+  </details>
+  <div class="src">Dates: US CPI (10 Nov), company results, Nvidia (17 Nov), FOMC (8–9 Dec), BOJ (18 Dec) as published by each company or institution. Odds are market pricing from CME FedWatch and MogWatch. The intervention example is 21 Oct 2022.</div>
+</details></section>
+
+<section id="weekly" class="weekly"><details class="sec"><summary>
+  <div class="ch">WEEKLY</div>
+  <h2>Reading this week’s market with logic</h2><div class="tap">Tap to open</div></summary>
+  <p style="font-size:14px;color:var(--muted)">Each week, real news is broken down with the four checks above.</p>
+  <div id="weeklyList"><div class="card empty">The first entry is coming soon.</div></div>
+</details></section>
+
+</main>
+<footer><div class="wrap">
+  This site is a learning resource and does not recommend buying or selling any security. Figures are rounded from each source. Investment decisions are your own responsibility.<br>© Market Logic
+</div></footer>
+<button class="theme-btn" id="themeBtn" aria-label="Toggle theme">◐</button>
+
+<script>
+const $=s=>document.querySelector(s);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NS='http://www.w3.org/2000/svg';
+const TXT=()=>({[css('--a')]:css('--at'),[css('--b')]:css('--bt'),[css('--c')]:css('--ct'),[css('--down')]:css('--downt'),[css('--muted')]:css('--mt')});
+const FILL=v=>({'--a':'--pa','--b':'--pb','--c':'--pc','--down':'--pdown','--muted':'--pm'}[v]||v);
+function el(tag,attrs,parent,text){if(tag==='text'&&attrs.fill){const m=TXT()[attrs.fill];if(m)attrs.fill=m;}const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+const fmt=n=>n.toLocaleString('ja-JP');
+
+/* ---------- generic line chart ---------- */
+function lineChart(svg,o){
+  svg.innerHTML='';
+  const [W,H]=svg.getAttribute('viewBox').split(' ').slice(2).map(Number);
+  const m=Object.assign({l:44,r:12,t:14,b:22},o.m||{});
+  const xs=o.series.flatMap(s=>s.pts.map(p=>p[0])), ys=o.series.flatMap(s=>s.pts.map(p=>p[1]));
+  const x0=o.xMin??Math.min(...xs), x1=o.xMax??Math.max(...xs);
+  const y0=o.yMin??Math.min(...ys), y1=o.yMax??Math.max(...ys);
+  const X=v=>m.l+(v-x0)/(x1-x0)*(W-m.l-m.r), Y=v=>H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b);
+  const g=el('g',{},svg);
+  (o.yTicks||[]).forEach(t=>{el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),stroke:css(t===0&&o.zero?'--muted':'--grid'),'stroke-width':t===0&&o.zero?1:1,'stroke-dasharray':t===0&&o.zero?'3 3':''},g);
+    el('text',{x:m.l-6,y:Y(t)+3.5,'text-anchor':'end','font-size':10,fill:css('--muted')},g,(o.yFmt||fmt)(t));});
+  (o.xTicks||[]).forEach(t=>el('text',{x:X(t[0]),y:H-6,'text-anchor':'middle','font-size':10,fill:css('--muted')},g,t[1]));
+  o.series.forEach(s=>{
+    const d=s.pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(' ');
+    if(s.area){const gid='g'+Math.random().toString(36).slice(2,8);const df=el('defs',{},g);const lg=el('linearGradient',{id:gid,x1:0,y1:0,x2:0,y2:1},df);
+      el('stop',{offset:'0%','stop-color':css(s.color),'stop-opacity':.34},lg);el('stop',{offset:'100%','stop-color':css(s.color),'stop-opacity':.02},lg);
+      el('path',{d:d+` L${X(s.pts.at(-1)[0])} ${Y(y0)} L${X(s.pts[0][0])} ${Y(y0)} Z`,fill:`url(#${gid})`},g);}
+    const path=el('path',{d,fill:'none',stroke:css(s.color),'stroke-width':s.w||2.2,'stroke-linejoin':'round','stroke-linecap':'round'},g);
+    if(s.step) path.setAttribute('d',s.pts.map((p,i)=>i?`H${X(p[0]).toFixed(1)} V${Y(p[1]).toFixed(1)}`:`M${X(p[0])} ${Y(p[1])}`).join(' '));
+    if(s.dots) s.pts.forEach(p=>el('circle',{cx:X(p[0]),cy:Y(p[1]),r:2.4,fill:css(s.color)},g));
+    const len=path.getTotalLength?path.getTotalLength():0;
+    if(false){path.style.strokeDasharray=len;path.style.strokeDashoffset=len;path.style.transition='stroke-dashoffset 1.4s ease';svg._anim=(svg._anim||[]).concat(path);}
+  });
+  (o.notes||[]).forEach(n=>{
+    const cx=X(n.x), cy=Y(n.y);
+    el('circle',{cx,cy,r:4,fill:css('--card'),stroke:css(n.color||'--fg'),'stroke-width':2},g);
+    const tx=cx+(n.dx||0), ty=cy+(n.dy??-10);
+    if(n.dx||n.dy) el('line',{x1:cx,y1:cy,x2:tx,y2:ty+ (n.dy>0?-9:3),stroke:css('--muted'),'stroke-width':.7},g);
+    const lines=n.t.split('\n');
+    lines.forEach((ln,i)=>el('text',{x:tx,y:ty+i*13.5,'text-anchor':n.anchor||'middle','font-size':10.5,'font-weight':i?400:700,fill:css(i?'--muted':(n.color||'--fg'))},g,ln));
+  });
+}
+function hBars(svg,o){
+  svg.innerHTML='';
+  const [W,H]=svg.getAttribute('viewBox').split(' ').slice(2).map(Number);
+  const lw=o.lw||96, n=o.rows.length, rh=(H-8)/n, max=o.max||Math.max(...o.rows.map(r=>r.v));
+  o.rows.forEach((r,i)=>{
+    const y=4+i*rh, bw=(W-lw-96)*r.v/max;
+    el('text',{x:0,y:y+rh/2+4,'font-size':11.5,fill:css('--fg'),'font-weight':500},svg,r.k);
+    if(r.sub) el('text',{x:0,y:y+rh/2+16,'font-size':9.5,fill:css('--muted')},svg,r.sub);
+    const b=el('rect',{x:lw,y:y+rh*.18,width:0,height:rh*.64,rx:5,fill:css(r.c||'--a')},svg);
+    b.style.transition='width .9s ease';requestAnimationFrame(()=>setTimeout(()=>b.setAttribute('width',Math.max(bw,2)),60));
+    el('text',{x:lw+bw+6,y:y+rh/2+4,'font-size':12,'font-weight':700,fill:css('--fg')},svg,r.label??r.v);
+  });
+}
+function vBars(svg,o){
+  svg.innerHTML='';
+  const [W,H]=svg.getAttribute('viewBox').split(' ').slice(2).map(Number);
+  const top=24,bot=36,n=o.rows.length,cw=(W-20)/n,max=o.max;
+  o.rows.forEach((r,i)=>{
+    const h=(H-top-bot)*r.v/max, x=10+i*cw+cw*.2, w=cw*.6, y=H-bot-h;
+    const b=el('rect',{x,y:H-bot,width:w,height:0,rx:6,fill:css(r.c||'--a')},svg);
+    b.style.transition='all .9s ease';setTimeout(()=>{b.setAttribute('y',y);b.setAttribute('height',h)},80);
+    el('text',{x:x+w/2,y:y-6,'text-anchor':'middle','font-size':13,'font-weight':900,fill:css('--fg')},svg,r.label);
+    el('text',{x:x+w/2,y:H-bot+15,'text-anchor':'middle','font-size':11,fill:css('--fg'),'font-weight':700},svg,r.k);
+    el('text',{x:x+w/2,y:H-bot+29,'text-anchor':'middle','font-size':10,fill:css('--muted')},svg,r.sub);
+  });
+}
+
+/* ---------- diagrams ---------- */
+function box(g,x,y,w,h,fillVar,text,sub,txtColor){
+  el('rect',{x,y,width:w,height:h,rx:10,fill:css(txtColor?fillVar:FILL(fillVar))},g);
+  el('text',{x:x+w/2,y:y+h/2+(sub?-2:4.5),'text-anchor':'middle','font-size':13,'font-weight':700,fill:txtColor||'#fff'},g,text);
+  if(sub) el('text',{x:x+w/2,y:y+h/2+12,'text-anchor':'middle','font-size':9.5,fill:txtColor||'#fff',opacity:.9},g,sub);
+}
+function arrow(g,x1,y1,x2,y2,color){
+  const id='ah'+Math.random().toString(36).slice(2,7);
+  const d=el('defs',{},g);const mk=el('marker',{id,viewBox:'0 0 10 10',refX:8,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'},d);
+  el('path',{d:'M0 0 L10 5 L0 10 z',fill:css(color||'--muted')},mk);
+  el('line',{x1,y1,x2,y2,stroke:css(color||'--muted'),'stroke-width':1.6,'marker-end':`url(#${id})`},g);
+}
+function drawMap(){
+  const s=$('#mapSvg');s.innerHTML='';
+  box(s,95,6,150,40,'--fg','News & events','Results / data / policy / shocks',css('--bg'));
+  const cols=[['--c','Earnings','EPS',20,'Profits, GDP'],['--a','Rates','P/E',125,'CPI · Fed/BOJ'],['--b','Sentiment','P/E',230,'Crises, fear']];
+  cols.forEach(c=>{arrow(s,170,48,c[3]+45,104,c[0]);box(s,c[3],108,90,46,c[0],c[1],c[4]);arrow(s,c[3]+45,156,170,212,c[0]);
+    el('text',{x:c[3]+45,y:178,'text-anchor':'middle','font-size':10.5,fill:css(c[0]),'font-weight':700},s,c[2]+' moves');});
+  box(s,95,216,150,44,'--fg','Price','= EPS × P/E',css('--bg'));
+  el('text',{x:170,y:284,'text-anchor':'middle','font-size':10.5,fill:css('--muted')},s,'FX acts via earnings; geopolitics via sentiment');
+}
+function drawSurprise(){
+  const s=$('#surSvg');s.innerHTML='';
+  box(s,0,8,108,40,'--muted','Market forecast','= priced in');
+  const rows=[['Result > forecast','Rises','--c',8],['Result = forecast','Barely moves','--muted',56],['Result < forecast','Falls','--down',104]];
+  rows.forEach(r=>{arrow(s,110,28,124,r[3]+20,r[2]);box(s,128,r[3],122,38,r[2],r[0]);
+    el('text',{x:256,y:r[3]+24,'font-size':12,'font-weight':900,fill:css(r[2])},s,r[1]);});
+}
+function drawCarry(){
+  const s=$('#carrySvg');s.innerHTML='';
+  const steps=[['①','BOJ hikes, US growth worries','Markets expect a narrower rate gap'],['②','Borrowing yen stops paying','Investors buy back yen to repay loans'],['③','Sharp yen surge','Exporters’ profit outlook falls (EPS ↓)'],['④','Stocks crash → losses → more selling','Chain reaction via sentiment (P/E ↓)']];
+  steps.forEach((t,i)=>{const y=4+i*52;
+    el('rect',{x:0,y,width:340,height:42,rx:10,fill:css('--soft')},s);
+    el('text',{x:12,y:y+26,'font-size':16,'font-weight':900,fill:css('--a')},s,t[0]);
+    el('text',{x:38,y:y+18,'font-size':12.5,'font-weight':700,fill:css('--fg')},s,t[1]);
+    el('text',{x:38,y:y+33,'font-size':10.5,fill:css('--muted')},s,t[2]);
+    if(i<3) el('text',{x:320,y:y+51,'font-size':11,'text-anchor':'middle',fill:css('--muted')},s,'▼');
+  });
+}
+
+/* ---------- chapter 1 interactive ---------- */
+function c1(){
+  const e=+$('#eps').value,p=+$('#per').value;
+  $('#epsO').textContent='¥'+e;$('#perO').textContent=p+'x';$('#priceO').textContent='¥'+fmt(e*p);
+  const s=$('#perSvg');s.innerHTML='';
+  el('text',{x:0,y:14,'font-size':11,fill:css('--muted')},s,'Price as blocks of EPS (1 block = 1 year of profit)');
+  const n=p,cols=20,bw=15.5,bh=11;
+  for(let i=0;i<40;i++){const x=(i%cols)*(bw+1.5),y=24+Math.floor(i/cols)*(bh+3);
+    el('rect',{x,y,width:bw,height:bh,rx:2.5,fill:css(i<n?'--a':'--grid')},s);}
+  el('text',{x:0,y:76,'font-size':12,'font-weight':700,fill:css('--fg')},s,`Paying for ${p} years of profit`);
+  el('text',{x:0,y:96,'font-size':10.5,fill:css('--muted')},s,'Guide: Japan’s market P/E has been roughly 13–17 in recent years,');
+  el('text',{x:0,y:110,'font-size':10.5,fill:css('--muted')},s,'about 60 in the 1989 bubble (Ch. 6)');
+}
+
+/* ---------- chapter 2 interactive ---------- */
+const cfStable=Array(10).fill(100), cfGrowth=[0,0,0,0,0,200,200,200,200,200];
+const pv=(cf,r)=>cf.reduce((a,c,i)=>a+c/Math.pow(1+r/100,i+1),0);
+function drawCF(){
+  const s=$('#cfSvg');s.innerHTML='';
+  const bw=13;
+  for(let i=0;i<10;i++){const x=24+i*31;
+    el('rect',{x,y:88-cfStable[i]*0.36,width:bw,height:cfStable[i]*0.36,rx:2,fill:css('--c')},s);
+    if(cfGrowth[i]) el('rect',{x:x+bw+1,y:88-cfGrowth[i]*0.36,width:bw,height:cfGrowth[i]*0.36,rx:2,fill:css('--b')},s);
+    el('text',{x:x+bw,y:102,'text-anchor':'middle','font-size':9.5,fill:css('--muted')},s,'Y'+(i+1));}
+  el('line',{x1:20,x2:336,y1:88,y2:88,stroke:css('--line')},s);
+}
+function c2(){
+  const r=+$('#r').value;$('#rO').textContent=r.toFixed(2)+'%';
+  const b1=pv(cfStable,1),b2=pv(cfGrowth,1),v1=pv(cfStable,r),v2=pv(cfGrowth,r);
+  const ch=(v,b)=>{const c=(v/b-1)*100;return (c>=0?'+':'')+c.toFixed(1)+'%'};
+  hBars($('#pvSvg'),{lw:84,max:1000,rows:[
+    {k:'Steady',sub:'value now',v:v1,c:'--c',label:`${Math.round(v1)} (${ch(v1,b1)})`},
+    {k:'Growth',sub:'value now',v:v2,c:'--b',label:`${Math.round(v2)} (${ch(v2,b2)})`}]});
+}
+
+/* ---------- static charts ---------- */
+function charts(){
+  const m=['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sp=[4766.18,4515.55,4373.94,4530.41,4131.93,4132.15,3785.38,4130.29,3955.00,3585.62,3871.98,4080.11,3839.50];
+  const ff=[0.25,0.25,0.25,0.50,0.50,1.00,1.75,2.50,2.50,3.25,3.25,4.00,4.50];
+  const xt=[[0,'21/12'],[3,'Mar'],[6,'Jun'],[9,'Sep'],[12,'Dec']];
+  lineChart($('#y22a'),{series:[{pts:sp.map((v,i)=>[i,v]),color:'--a',area:true,dots:true}],yMin:3400,yMax:4900,yTicks:[3500,4000,4500],xTicks:xt,
+    notes:[{x:0,y:4766,t:'4,766',dy:-8,anchor:'start',dx:4},{x:9,y:3586,t:'3,586',dy:16,color:'--down'},{x:12,y:3840,t:'3,840\nYear −19.4%',dx:-30,dy:-52,color:'--down',anchor:'middle'}]});
+  lineChart($('#y22b'),{series:[{pts:ff.map((v,i)=>[i,v]),color:'--b',step:true,w:2.6}],yMin:0,yMax:5,yTicks:[0,2,4],yFmt:v=>v+'%',xTicks:xt,m:{t:8},
+    notes:[{x:6,y:1.75,t:'0.75-pt jumbo hike',dx:-8,dy:-22,color:'--b',anchor:'end'},{x:12,y:4.5,t:'4.50%',dx:-6,dy:-6,anchor:'end',color:'--b'}]});
+
+  hBars($('#nvBar'),{lw:96,max:14,rows:[
+    {k:'Forecast',sub:'Before results',v:7.15,c:'--muted',label:'~7.2'},
+    {k:'Guidance',sub:'Given 24 May 2023',v:11.0,c:'--a',label:'~11.0 (+54%)'},
+    {k:'Actual',sub:'Reported 23 Aug 2023',v:13.51,c:'--c',label:'13.5'}]});
+  lineChart($('#nvPx'),{series:[{pts:[[0,305.38],[1,379.80]],color:'--a',dots:true,w:3}],yMin:280,yMax:420,yTicks:[300,350,400],yFmt:v=>'$'+v,
+    xTicks:[[0,'5/24 before'],[1,'5/25 next day']],m:{l:44,r:40},notes:[{x:0,y:305.38,t:'$305',dy:18,dx:6,anchor:'start'},{x:1,y:379.80,t:'$380  +24.4%',dy:-12,color:'--c',anchor:'end'}]});
+
+  vBars($('#tyBar'),{max:6,rows:[
+    {k:'FY to 3/2022',sub:'$1 ≈ ¥112',v:2.9956,label:'3.00tn',c:'--muted'},
+    {k:'FY to 3/2023',sub:'$1 ≈ ¥135',v:2.7250,label:'2.73tn',c:'--down'},
+    {k:'FY to 3/2024',sub:'$1 ≈ ¥145',v:5.3529,label:'5.35tn',c:'--a'}]});
+
+  // Nikkei Jul-Aug 2024 (x = day of Jul..)
+  const nk=[[11,42224.02],[31,39101.82],[32,38126.33],[33,35909.70],[36,31458.42],[37,34675.46],[47,38062.67]];
+  const fx=[[3,161.7],[11,161.6],[31,150.0],[33,146.5],[36,144.2],[37,144.3],[47,147.6]];
+  const xt2=[[3,'7/3'],[11,'7/11'],[31,'7/31'],[36,'8/5'],[47,'8/16']];
+  lineChart($('#nkA'),{series:[{pts:nk,color:'--a',dots:true,area:true}],xMin:3,xMax:47,yMin:29000,yMax:44000,yTicks:[30000,35000,40000],yFmt:v=>v/1000+'k',xTicks:xt2,
+    notes:[{x:11,y:42224,t:'High 42,224',dy:-8,anchor:'start',dx:-2},{x:36,y:31458,t:'8/5 −12.4%',dx:-14,dy:6,color:'--down',anchor:'end'},{x:37,y:34675,t:'Next day\n+10.2%',dx:8,dy:14,color:'--c',anchor:'start'}]});
+  lineChart($('#nkB'),{series:[{pts:fx,color:'--b',dots:true,area:true}],xMin:3,xMax:47,yMin:140,yMax:165,yTicks:[145,155,165],xTicks:xt2,m:{t:8},
+    notes:[{x:3,y:161.7,t:'~¥162\n37-year low',dx:4,dy:22,anchor:'start',color:'--b'},{x:36,y:144.2,t:'Yen surges',dx:-40,dy:4,anchor:'end',color:'--b'}]});
+
+  // drawdowns
+  const lp=1565.15, lm=[[0,1565.15],[339,1251.70],[367,899.22],[408,752.44],[455,934.70],[517,676.53],[814,1115.10],[927,1217.28],[1179,1257.64],[1298,1363.61],[1455,1099.23],[1910,1426.19],[1997,1569.19]];
+  const cp=3386.15, cv=[[0,3386.15],[22,2480.64],[33,2237.40],[70,2939.51],[110,3232.39],[181,3389.78]];
+  const toDD=(a,p)=>a.map(([d,v])=>[d,(v/p-1)*100]);
+  lineChart($('#ddSvg'),{m:{r:36},series:[{pts:toDD(lm,lp),color:'--down'},{pts:toDD(cv,cp),color:'--a',w:2.8}],xMin:0,xMax:2000,yMin:-62,yMax:6,yTicks:[0,-20,-40,-60],zero:true,yFmt:v=>v+'%',
+    xTicks:[[0,'0'],[500,'500 days'],[1000,'1000 days'],[1500,'1500 days'],[2000,'2000 days']],
+    notes:[{x:33,y:-33.9,t:'−33.9%\n33 days',dx:-2,dy:28,color:'--a',anchor:'start'},{x:181,y:0.1,t:'Back in 181 days',dx:20,dy:-4,color:'--a',anchor:'start'},
+      {x:517,y:-56.8,t:'−56.8% in 517 days',dx:40,dy:4,color:'--down',anchor:'start'},{x:1997,y:0.3,t:'Back in 1997 days',dx:-6,dy:-6,color:'--down',anchor:'end'}]});
+
+  const lg=[[1989.99,38915.87],[1990.99,23848.71],[1992.99,16924.95],[2003.32,7607.88],[2007.5,18261.98],[2009.19,7054.98],[2012.99,10395.18],[2015.99,19033.71],[2017.99,22764.94],[2020.99,27444.17],[2022.99,26094.50],[2023.99,33464.17],[2024.15,39098.68],[2024.99,39894.54]];
+  lineChart($('#lgSvg'),{series:[{pts:lg,color:'--a',area:true}],xMin:1989,xMax:2025.5,yMin:0,yMax:46000,yTicks:[0,10000,20000,30000,40000],yFmt:v=>v?v/1000+'k':'0',
+    xTicks:[[1990,'1990'],[2000,'2000'],[2010,'2010'],[2020,'2020']],m:{r:16},
+    notes:[{x:1989.99,y:38915.87,t:'End-1989 38,916',dx:4,dy:-6,anchor:'start'},{x:2009.19,y:7054.98,t:'Mar 2009 7,055',dy:18,color:'--down'},{x:2024.15,y:39098.68,t:'22 Feb 2024\nFirst record in 34 yrs',dx:-6,dy:-22,anchor:'end',color:'--c'}]});
+
+  // decomposition: price ≈ EPS × P/E
+  const s=$('#decSvg');s.innerHTML='';
+  const rows=[['End-1989',38916,'~¥650','~60x',650,60],['Feb 2024',39099,'~¥2,400','~16x',2400,16]];
+  rows.forEach((r,i)=>{const y=8+i*62;
+    el('text',{x:0,y:y+12,'font-size':12.5,'font-weight':900,fill:css('--fg')},s,r[0]+'  ¥'+fmt(r[1]));
+    const ew=r[4]/2400*150, pw=r[5]/60*150;
+    el('rect',{x:0,y:y+20,width:ew,height:12,rx:3,fill:css('--c')},s);el('text',{x:ew+6,y:y+30,'font-size':10.5,fill:css('--fg')},s,'EPS (profit) '+r[2]);
+    el('rect',{x:0,y:y+36,width:pw,height:12,rx:3,fill:css('--b')},s);el('text',{x:pw+6,y:y+46,'font-size':10.5,fill:css('--fg')},s,'P/E (expectation) '+r[3]);
+  });
+  el('text',{x:340,y:126,'text-anchor':'end','font-size':9.5,fill:css('--muted')},s,'EPS back-calculated as price ÷ P/E');
+}
+
+/* ---------- chapter 8 ---------- */
+const FLAG={"us": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2019%2013%27%3E%3Crect%20width%3D%2719%27%20height%3D%2713%27%20fill%3D%27%23b22234%27/%3E%3Cpath%20d%3D%27M0%201.5h19M0%204.5h19M0%207.5h19M0%2010.5h19%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271%27/%3E%3Crect%20width%3D%278%27%20height%3D%277%27%20fill%3D%27%233c3b6e%27/%3E%3C/svg%3E", "jp": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%203%202%27%3E%3Crect%20width%3D%273%27%20height%3D%272%27%20fill%3D%27%23fff%27/%3E%3Ccircle%20cx%3D%271.5%27%20cy%3D%271%27%20r%3D%27.6%27%20fill%3D%27%23bc002d%27/%3E%3C/svg%3E", "ua": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%203%202%27%3E%3Crect%20width%3D%273%27%20height%3D%271%27%20fill%3D%27%230057b7%27/%3E%3Crect%20y%3D%271%27%20width%3D%273%27%20height%3D%271%27%20fill%3D%27%23ffd700%27/%3E%3C/svg%3E", "ru": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%209%206%27%3E%3Crect%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%23fff%27/%3E%3Crect%20y%3D%272%27%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%230039a6%27/%3E%3Crect%20y%3D%274%27%20width%3D%279%27%20height%3D%272%27%20fill%3D%27%23d52b1e%27/%3E%3C/svg%3E", "cn": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2030%2020%27%3E%3Crect%20width%3D%2730%27%20height%3D%2720%27%20fill%3D%27%23de2910%27/%3E%3Cpath%20d%3D%27M5%202.5l1.18%203.62h3.8l-3.07%202.24%201.17%203.62L5%209.74l-3.08%202.24%201.17-3.62L0%206.12h3.82z%27%20fill%3D%27%23ffde00%27/%3E%3C/svg%3E", "world": "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2016%27%3E%3Crect%20width%3D%2724%27%20height%3D%2716%27%20fill%3D%27%232f6bff%27/%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%278%27%20r%3D%276%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271.2%27/%3E%3Cpath%20d%3D%27M6%208h12M12%202c-2.5%203-2.5%209%200%2012M12%202c2.5%203%202.5%209%200%2012%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271%27/%3E%3C/svg%3E"};
+function divBars(svg,o){
+  svg.innerHTML='';
+  const [W,H]=svg.getAttribute('viewBox').split(' ').slice(2).map(Number);
+  const n=o.rows.length, rh=(H-4)/n, mid=o.mid||W/2, sc=(o.half||118)/o.max;
+  o.rows.forEach((r,i)=>{
+    const y=2+i*rh, w=Math.abs(r.v)*sc, pos=r.v>=0, by=y+17, bh=Math.min(13,rh-22);
+    el('line',{x1:mid,x2:mid,y1:by-3,y2:by+bh+3,stroke:css('--muted'),'stroke-dasharray':'2 2'},svg);
+    let tx=0; (r.f||[]).forEach(f=>{el('image',{href:FLAG[f],x:tx,y:y+1,width:16,height:11,preserveAspectRatio:'none'},svg);el('rect',{x:tx,y:y+1,width:16,height:11,rx:1.5,fill:'none',stroke:css('--line'),'stroke-width':.8},svg);tx+=19;});
+    if(r.lv){const LC={Best:'--a',Foresaw:'--b',Skilled:'--c',Typical:'--muted',Mistake:'--down',Note:'--muted'};const bw=r.lv.length*5.6+12;el('rect',{x:tx,y:y,width:bw,height:14,rx:7,fill:css(FILL(LC[r.lv]))},svg);el('text',{x:tx+bw/2,y:y+10.5,'text-anchor':'middle','font-size':9.5,'font-weight':900,fill:'#fff'},svg,r.lv);tx+=bw+5;}
+    const t=el('text',{x:tx,y:y+11,'font-size':11.5,'font-weight':700,fill:css('--fg')},svg,r.k);
+    if(r.sub) el('tspan',{dx:6,'font-size':9.5,'font-weight':400,fill:css('--muted')},t,r.sub);
+    el('rect',{x:pos?mid:mid-w,y:by,width:Math.max(w,1.5),height:bh,rx:4,fill:css(pos?'--c':'--down')},svg);
+    const lbl=r.fin!=null?'$'+fmt(Math.round(r.fin))+' ('+(pos?'+':'−')+'$'+fmt(Math.abs(Math.round(r.v)))+')':(pos?'+':'−')+'$'+fmt(Math.abs(Math.round(r.v)))+(r.pct?' ('+r.pct+')':'');
+    el('text',{x:W,y:o.valRow?by+bh-2:y+11,'text-anchor':'end','font-size':11.5,'font-weight':900,fill:css(pos?'--c':'--down')},svg,lbl);
+    if(r.note) el('text',{x:pos?mid-4:mid+4,y:by+bh-2,'text-anchor':pos?'end':'start','font-size':9.5,fill:css('--muted')},svg,r.note);
+  });
+}
+function c8(){
+  // 2026 midterm daily closes
+  const d=[['10/30',7580.07],['11/2',7541.40],['11/3',7568.92],['11/4',7688.62],['11/5',7353.73],['11/6',7376.86]];
+  lineChart($('#mt26'),{series:[{pts:d.map((v,i)=>[i,v[1]]),color:'--a',dots:true,area:true},{pts:[[0,7818.93],[5,7818.93]],color:'--muted',w:1}],
+    yMin:7250,yMax:7900,yTicks:[7300,7500,7700,7900],m:{b:30,r:14},xTicks:d.map((v,i)=>[i,v[0]]),
+    notes:[{x:2,y:7568.92,t:'Vote',dy:20,color:'--a'},{x:3,y:7688.62,t:'+1.6%',dy:-12,color:'--c'},{x:4,y:7353.73,t:'−4.4%',dy:18,color:'--down'},{x:5,y:7376.86,t:'7,377',dy:-12,anchor:'end',dx:-2}]});
+  const P={d3:7568.92,d4:7688.62,d5:7353.73,d6:7376.86};
+  const lad=(id,rows)=>divBars($(id),{max:o_max(rows),mid:150,half:80,valRow:true,rows:rows.map(r=>({k:r[1],lv:r[0],v:r[2]-1000,fin:r[2]}))});
+  function o_max(rows){return Math.max(60,...rows.map(r=>Math.abs(r[2]-1000)))*1.05;}
+  lad('#mtLad',[
+    ['Best','Sell all 11/4, buy all back 11/5',1000*(P.d4/P.d3)*(P.d6/P.d5)],
+    ['Foresaw','Before vote, switch Nasdaq → Dow',1000*51285.73/51786.72],
+    ['Skilled','Sell half 11/4, buy back 11/5',(()=>{const u=1000/P.d3;return (u/2+(u/2*P.d4)/P.d5)*P.d6})()],
+    ['Typical','Keep holding the S&P 500',1000*P.d6/P.d3],
+    ['Typical','Keep holding the Nasdaq',1000*24579.42/25372.01],
+    ['Mistake','Sell everything in the 11/5 drop',1000*P.d5/P.d3]]);
+  lad('#mtLad2',[
+    ['Skilled','Add $1,000 in the 11/5 drop',1000*P.d6/P.d5],
+    ['Mistake','Chase the 11/4 rise with $1,000',1000*P.d6/P.d4]]);
+  divBars($('#mtAsset1'),{max:125,mid:150,half:80,valRow:true,rows:[
+    {k:'World stocks (MSCI ACWI)',f:['world'],v:-31,pct:'−3.1%'},
+    {k:'Dow',f:['us'],v:-34,pct:'−3.4%'},
+    {k:'S&P500',f:['us'],v:-1000*(1-P.d5/P.d4),pct:'−4.4%'},
+    {k:'Nasdaq Composite',f:['us'],v:-55.2,pct:'−5.5%'},
+    {k:'Nikkei (next day, 11/6)',f:['jp'],v:-59.6,pct:'−6.0%'},
+    {k:'Chip ETF (SOXX)',f:['us'],v:-120,pct:'~−12%'}]});
+  divBars($('#mtAsset2'),{max:95,mid:150,half:80,valRow:true,rows:[
+    {k:'Dow',f:['us'],v:1000*(51285.73/51786.72-1),pct:'−1.0%'},
+    {k:'S&P500',f:['us'],v:1000*(P.d6/P.d3-1),pct:'−2.5%'},
+    {k:'S&P 500 in yen (incl. FX)',f:['us','jp'],v:1000*(P.d6*158.48/(P.d3*158.73)-1),pct:'−2.7%'},
+    {k:'Nasdaq Composite',f:['us'],v:1000*(24579.42/25372.01-1),pct:'−3.1%'},
+    {k:'Nikkei 225',f:['jp'],v:1000*(57434.77/63081.86-1),pct:'−9.0%'}]});
+  // units diagram
+  (function(){const s=$('#mtUnits');s.innerHTML='';
+    const u0=1000/P.d3, half=u0/2, cash=half*P.d4, reb=cash/P.d5, U=x=>x/u0*100, k=1.15, base=178;
+    const cols=[
+      {x:8,h:'11/3 vote',sub:'Hold S&P 500',bl:[[U(u0),'--a','100']],cap:'$1,000'},
+      {x:92,h:'11/4 +1.6%',sub:'Sell half',bl:[[U(half),'--a','50'],[50,'--b','Cash']],cap:'Cash $'+Math.round(cash)},
+      {x:176,h:'11/5 −4.4%',sub:'Rebuy with cash',bl:[[U(half),'--a','50'],[U(reb),'--c',U(reb).toFixed(1)]],cap:'+'+(U(reb)-50).toFixed(1)+' extra units'},
+      {x:260,h:'11/6 value',sub:'Total units',bl:[[U(half+reb),'--c',(U(half+reb)).toFixed(1)]],cap:'vs start +'+(U(half+reb)-100).toFixed(1)+'%'}];
+    el('line',{x1:0,x2:340,y1:base-100*k,y2:base-100*k,stroke:css('--muted'),'stroke-dasharray':'3 3'},s);
+    el('text',{x:340,y:base-100*k-4,'text-anchor':'end','font-size':9.5,fill:css('--muted')},s,'Starting 100 units');
+    cols.forEach((c,i)=>{let y=base;
+      el('text',{x:c.x+36,y:14,'text-anchor':'middle','font-size':11,'font-weight':900,fill:css('--fg')},s,c.h);
+      el('text',{x:c.x+36,y:27,'text-anchor':'middle','font-size':9.5,fill:css('--muted')},s,c.sub);
+      c.bl.forEach(b=>{const h=b[0]*k;y-=h;el('rect',{x:c.x+10,y:y+1,width:52,height:h-2,rx:5,fill:css(FILL(b[1]))},s);
+        el('text',{x:c.x+36,y:y+h/2+4,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:'#fff'},s,b[2]);});
+      el('text',{x:c.x+36,y:base+16,'text-anchor':'middle','font-size':10,'font-weight':700,fill:css(i==3?'--c':'--fg')},s,c.cap);
+      if(i<3) el('text',{x:c.x+80,y:base-60,'text-anchor':'middle','font-size':13,fill:css('--muted')},s,'→');});
+    const v1=(half+reb)*P.d6, v0=1000*P.d6/P.d3;
+    el('rect',{x:0,y:206,width:340,height:40,rx:10,fill:css('--soft')},s);
+    el('text',{x:12,y:222,'font-size':11,fill:css('--fg')},s,'Value on 11/6: this plan $'+v1.toFixed(1)+' · do nothing $'+v0.toFixed(1));
+    el('text',{x:12,y:238,'font-size':11,'font-weight':900,fill:css('--c')},s,'Difference +$'+(v1-v0).toFixed(1)+' from rebuying more, cheaper');
+  })();
+
+  // cross-event: buy at event-day close, hold ~1 month
+  const ev=[
+    ['2008 Lehman collapse','9/15→10/15',1192.70,907.84,(899.22/1192.70-1)*100],
+    ['2016 Trump win','11/9→12/9',2163.26,2259.53,0],
+    ['2020 COVID (WHO day)','3/11→4/13',2741.38,2761.63,(2237.40/2741.38-1)*100],
+    ['2020 COVID (Fed day)','3/23→4/23',2237.40,2797.80,0],
+    ['2022 Ukraine invasion','2/24→3/24',4288.70,4520.16,(4170.70/4288.70-1)*100],
+    ['2024 Japan crash (Nikkei)','8/5→9/5',31458.42,36657.09,0],
+    ['2024 Trump win','11/6→12/6',5929.04,6090.27,(5870.62/5929.04-1)*100],
+    ['2025 Day after tariffs','4/3→5/2',5396.52,5686.67,(4982.77/5396.52-1)*100],
+    ['2026 Midterms (so far)','11/4→11/6',7688.62,7376.86,(7353.73/7688.62-1)*100]];
+  const EF=[['us','world'],['us'],['world'],['world'],['ru','ua'],['jp'],['us'],['us','cn'],['us']];
+  divBars($('#evBars'),{max:260,half:112,rows:ev.map((e,i)=>{const r=(e[3]/e[2]-1)*100;
+    return {f:EF[i],k:e[0],sub:e[1],v:r*10,pct:(r>=0?'+':'−')+Math.abs(r).toFixed(1)+'%',note:e[4]<-0.05?`low ${e[4].toFixed(1)}%`:'no paper loss'}})});
+
+  // predictability grid
+  const g=$('#evGrid');g.innerHTML='';
+  const cols=['Foresee','Reaction','Signal'];
+  const rows=[['2008 Lehman collapse',[1,1,0],'None (6 months early)'],['2016 Trump win',[1,1,2],'Futures plunge'],['2020 COVID',[0,1,3],'Fed action'],['2022 Invasion',[2,1,2],'Invasion starts'],['2024 Trump win',[2,3,3],'Count confirmed'],['2025 Tariffs',[2,1,2],'VIX above 50'],['2026 Midterms',[2,2,1],'Count (next day only)']];
+  cols.forEach((c,i)=>el('text',{x:182+i*56,y:14,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:css('--muted')},g,c));
+  rows.forEach((r,j)=>{const y=40+j*43;
+    const GF=[['us'],['us'],['world'],['ru','ua'],['us'],['us','cn'],['us']][j]||[];let gx=0;GF.forEach(f=>{el('image',{href:FLAG[f],x:gx,y:y-10,width:14,height:10,preserveAspectRatio:'none'},g);el('rect',{x:gx,y:y-10,width:14,height:10,rx:1.5,fill:'none',stroke:css('--line'),'stroke-width':.8},g);gx+=17;});
+    el('text',{x:gx,y:y,'font-size':11.5,'font-weight':700,fill:css('--fg')},g,r[0]);
+    el('text',{x:0,y:y+14,'font-size':9.5,fill:css('--muted')},g,'Signal: '+r[2]);
+    r[1].forEach((v,i)=>{for(let k=0;k<3;k++)el('circle',{cx:182+i*56-12+k*12,cy:y+2,r:4.2,fill:css(k<v?['--down','--b','--c'][Math.max(v-1,0)]:'--grid')},g);});
+    if(j<rows.length-1) el('line',{x1:0,x2:340,y1:y+24,y2:y+24,stroke:css('--line')},g);
+  });
+
+  // Ukraine 2022
+  const uk=[[0,4225.50],[1,4288.70],[5,4201.09],[6,4170.70],[11,4462.21],[19,4631.60],[80,3666.77]];
+  lineChart($('#ukr'),{series:[{pts:uk,color:'--a',dots:true,area:true}],xMin:0,xMax:82,yMin:3500,yMax:4800,yTicks:[3600,4000,4400,4800],
+    xTicks:[[0,'2/23'],[19,'3/29'],[80,'6/16']],m:{r:14},
+    notes:[{x:1,y:4288.70,t:'Invasion day: buy',dx:0,dy:32,anchor:'start',color:'--a'},{x:19,y:4631.60,t:'+8.0%',dy:-10,color:'--c'},{x:80,y:3666.77,t:'Falls again on hikes',dx:-10,dy:10,anchor:'end',color:'--down'}]});
+  // COVID 2020
+  const cv=[[0,3386.15],[13,3128.21],[14,3015.05],[17,2741.38],[22,2480.64],[29,2237.40],[30,2447.33],[51,2797.80],[90,3232.39],[124,3389.78]];
+  lineChart($('#cov'),{series:[{pts:cv,color:'--a',dots:true,area:true}],xMin:0,xMax:126,yMin:2000,yMax:3600,yTicks:[2000,2500,3000,3500],
+    xTicks:[[0,'2/19'],[29,'3/23'],[51,'4/23'],[124,'8/18']],m:{r:14},
+    notes:[{x:17,y:2741.38,t:'WHO',dx:-7,dy:4,anchor:'end',color:'--muted'},{x:29,y:2237.40,t:'Fed acts = bottom',dx:8,dy:14,anchor:'start',color:'--c'},{x:51,y:2797.80,t:'1 month +25%',dx:8,dy:16,anchor:'start',color:'--c'},{x:124,y:3389.78,t:'Back at high',dx:-4,dy:-10,anchor:'end'}]});
+  // Tariff 2025
+  const tr=[[0,5670.97],[1,5396.52],[2,5074.08],[3,5062.25],[4,4982.77],[5,5456.90],[21,5686.67],[60,6173.07]];
+  lineChart($('#tar'),{series:[{pts:tr,color:'--a',dots:true,area:true}],xMin:0,xMax:62,yMin:4800,yMax:6300,yTicks:[5000,5500,6000],
+    xTicks:[[0,'4/2'],[4,'4/8'],[21,'5/2'],[60,'6/27']],m:{r:14},
+    notes:[{x:4,y:4982.77,t:'VIX 52 = buy',dx:8,dy:16,anchor:'start',color:'--c'},{x:5,y:5456.90,t:'Pause +9.5%',dx:8,dy:20,anchor:'start',color:'--c'},{x:60,y:6173.07,t:'New record',dx:-4,dy:-10,anchor:'end'}]});
+}
+
+function pastLadders(){
+  const lad=(id,rows)=>divBars($(id),{max:Math.max(...rows.map(r=>Math.abs(r[2]-1000)))*1.05,mid:150,half:80,valRow:true,rows:rows.map(r=>({k:r[1],lv:r[0],v:r[2]-1000,fin:r[2]}))});
+  lad('#ladCov',[['Best','Sell 2/19, rebuy 3/23 (bottom)',1000*2797.80/2237.40],['Skilled','Sold 3/12, rebought on Fed day',1000*2480.64/3386.15*2797.80/2237.40],['Typical','Do nothing, keep holding',1000*2797.80/3386.15],['Mistake','Sell 3/12 (−9.5% day), stay out',1000*2480.64/3386.15]]);
+  lad('#ladUkr',[['Best','Sell all at the 3/29 rebound',1000*4631.60/4225.50],['Note','Sold in the 3/8 drop (lucky)',1000*4170.70/4225.50],['Skilled','Sell half 2/24, back at pre-war level',500*4288.70/4225.50+500*3666.77/4225.50],['Typical','Do nothing, keep holding',1000*3666.77/4225.50]]);
+  lad('#ladTar',[['Best','Sell 4/2, rebuy 4/8 (bottom)',1000*5686.67/4982.77],['Skilled','Sold 4/4, rebought 4/8 (VIX > 50)',1000*5074.08/5670.97*5686.67/4982.77],['Typical','Do nothing, keep holding',1000*5686.67/5670.97],['Mistake','Sell 4/4 (−6% day), stay out',1000*5074.08/5670.97]]);
+}
+function nowNext(){
+  const NOW=[[["Aug 2024 Japan crash → 1 month", 165, ["jp"]], ["Apr 2025 tariff shock → 1 month", 54, ["us"]], ["2008 Lehman → 1 month", -239, ["us"]]], [["13 Sep 2022, CPI above (1 day)", -43, ["us"]], ["10 Nov 2022, CPI below (1 day)", 55, ["us"]], ["2022, a year of hikes (S&P 500)", -194, ["us"]]], [["S&P 500 on 11/4, oil −8.6%", 16, ["us"]], ["2022 energy stocks (1 year)", 580, ["us"]], ["2022 invasion → 6/16 (S&P 500)", -145, ["ru", "ua"]]], [["11/4, results day", 16, ["us"]], ["Held 11/3 → 11/6", -25, ["us"]], ["11/5 chip ETF (1 day)", -120, ["us"]]], [["5 Aug 2024 Nikkei (1 day)", -124, ["jp"]], ["5 Aug 2024 → 1 month later", 165, ["jp"]], ["Nikkei this week (11/2–6)", -93, ["jp"]]]];
+  NOW.forEach((rows,i)=>divBars($('#now'+i),{max:Math.max(...rows.map(r=>Math.abs(r[1])))*1.05,mid:150,half:80,valRow:true,rows:rows.map(r=>({k:r[0],f:r[2],v:r[1],pct:(r[1]>=0?'+':'−')+(Math.abs(r[1])/10).toFixed(1)+'%'}))}));
+  const F={sc:[[["Past case, CPI above (13 Sep 2022)", -43], ["Past case, CPI below (10 Nov 2022)", 55]], [["11/5 Qualcomm sales miss (1 day)", -95]], [["May 2023 guidance beat (next day)", 240], ["Jan 2025 DeepSeek shock (1 day)", -170]], [], [["31 Jul 2024 hike → 5 Aug Nikkei", -124]]],mb:[[["11/4, ceasefire hopes alone: Dow", 30], ["Same day: S&P 500", 16]], [["2022 invasion → 1 month", 54], ["2022 invasion → 6/16", -145]], [["2008 Lehman → 1 month", -239], ["2008 collapse → bottom (6 mo)", -433]], [["5 Aug 2024 Nikkei (1 day)", -124], ["5 Aug → 5 Sep 2024 Nikkei", 165]], [["21 Oct 2022 intervention: USD/JPY (151.9→144)", -52]]]};
+  for(const p in F) F[p].forEach((rows,i)=>{if(!rows.length)return;divBars($('#'+p+i),{max:Math.max(...rows.map(r=>Math.abs(r[1])))*1.05,mid:150,half:80,valRow:true,rows:rows.map(r=>({k:r[0],v:r[1],pct:(r[1]>=0?'+':'−')+(Math.abs(r[1])/10).toFixed(1)+'%'}))});});
+}
+function openHash(h){const t=h&&document.querySelector(h);if(t){const d=t.querySelector('details.sec');if(d)d.open=true;}}
+document.querySelectorAll('#toc a').forEach(a=>a.addEventListener('click',()=>openHash(a.hash)));
+window.addEventListener('hashchange',()=>openHash(location.hash));openHash(location.hash);
+/* ---------- quiz ---------- */
+document.querySelectorAll('.quiz').forEach(q=>{const ok=+q.dataset.ok;q.querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{
+  q.querySelectorAll('button').forEach((x,j)=>x.className=j===ok?'ok':(j===i?'ng':''));q.classList.add('done');});});
+
+/* ---------- weekly ---------- */
+fetch('data/weekly.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(list=>{
+  if(!list.length) return;
+  const lv={rate:['Rates','--a'],earn:['Earnings','--c'],fx:['FX','--b'],risk:['Sentiment','--down']};
+  $('#weeklyList').innerHTML=list.slice().reverse().map(w=>`<div class="card wk"><div class="date">${w.week}</div><h4>${w.title}</h4>
+    <div>${(w.levers||[]).map(k=>`<span class="tag">${lv[k]?.[0]||k}</span>`).join('')}</div>
+    <p style="font-size:14px;margin:8px 0 0">${w.summary}</p>
+    ${w.points?`<ul style="font-size:14px;padding-left:18px;margin:6px 0 0">${w.points.map(p=>`<li>${p}</li>`).join('')}</ul>`:''}
+    ${w.link?`<a href="${w.link}" style="font-size:13px">Read more →</a>`:''}</div>`).join('');
+}).catch(()=>{});
+
+/* ---------- render / theme / scroll ---------- */
+function renderAll(){drawMap();drawSurprise();drawCarry();drawCF();c1();c2();charts();c8();pastLadders();nowNext();
+  document.querySelectorAll('svg').forEach(s=>(s._anim||[]).forEach(p=>{p.style.transition='none';p.style.strokeDashoffset=0;}));}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){(e.target._anim||[]).forEach(p=>p.style.strokeDashoffset=0);io.unobserve(e.target);}}),{threshold:.3});
+function first(){drawMap();drawSurprise();drawCarry();drawCF();c1();c2();charts();c8();pastLadders();nowNext();document.querySelectorAll('svg').forEach(s=>s._anim&&io.observe(s));}
+['eps','per'].forEach(id=>$('#'+id).oninput=c1);$('#r').oninput=c2;
+$('#themeBtn').onclick=()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+  r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('theme',r.dataset.theme)}catch(e){};renderAll();};
+try{const t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',renderAll);
+const links=[...document.querySelectorAll('#toc a')];
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.hash==='#'+e.target.id));
+  const on=links.find(a=>a.hash==='#'+e.target.id);if(on){const w=on.parentElement;w.scrollTo({left:on.offsetLeft-w.clientWidth/2+on.clientWidth/2,behavior:'smooth'});}}}),{rootMargin:'-45% 0px -50% 0px'});
+document.querySelectorAll('main section').forEach(s=>so.observe(s));
+(document.fonts?document.fonts.ready:Promise.resolve()).then(first);
+</script>
+</body>
+</html>
