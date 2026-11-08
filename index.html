@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How News Moves Stocks</title>
+<meta name="description" content="A visual study guide to how world events move stock prices, explained with real historical cases.">
+<style>
+:root{
+  color-scheme: light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --up:#2a78d6; --down:#e34948; --mid:#f0efec;
+  --accent-wash:#eaf2fc;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926; --up:#3987e5; --down:#e66767; --mid:#383835;
+    --accent-wash:#16243a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --up:#3987e5; --down:#e66767; --mid:#383835;
+  --accent-wash:#16243a;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+header.hero{padding:56px 0 32px}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+h1{font-size:clamp(30px,6vw,44px);line-height:1.15;margin:0 0 16px;letter-spacing:-.01em}
+h2{font-size:clamp(22px,4vw,28px);line-height:1.25;margin:0 0 8px}
+h3{font-size:17px;margin:28px 0 8px}
+p{margin:0 0 14px}
+.lede{font-size:18px;color:var(--ink-2);max-width:62ch}
+.note{font-size:13px;color:var(--muted)}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 0}
+nav.toc a{font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--ring);background:var(--surface);padding:6px 12px;border-radius:999px}
+nav.toc a:hover{background:var(--accent-wash)}
+section.lesson{background:var(--surface);border:1px solid var(--ring);border-radius:16px;padding:28px 24px;margin:24px 0}
+.num{display:inline-block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.principle{border-left:3px solid var(--s1);padding:10px 14px;background:var(--accent-wash);border-radius:0 10px 10px 0;margin:16px 0;font-weight:600}
+.case{border-top:1px solid var(--grid);margin-top:24px;padding-top:8px}
+.case-tag{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;margin:14px 0}
+.flow .step{flex:1 1 140px;border:1px solid var(--ring);border-radius:10px;padding:10px 12px;background:var(--page);font-size:14px}
+.flow .step b{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.flow .arrow{align-self:center;color:var(--muted);font-size:18px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.tile{border:1px solid var(--ring);border-radius:12px;padding:12px 14px;background:var(--page)}
+.tile .v{font-size:26px;font-weight:700;line-height:1.2}
+.tile .l{font-size:13px;color:var(--ink-2)}
+.chart{margin:12px 0 4px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-title{font-size:14px;font-weight:600;margin:16px 0 0}
+.chart-sub{font-size:13px;color:var(--muted);margin:0}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--ink-2);margin:6px 0 0;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+details.table{margin:6px 0 0;font-size:13px}
+details.table summary{color:var(--muted);cursor:pointer}
+details.table table{border-collapse:collapse;margin-top:6px;font-variant-numeric:tabular-nums}
+details.table td,details.table th{border-bottom:1px solid var(--grid);padding:4px 10px 4px 0;text-align:left}
+ul.check{padding-left:20px;margin:8px 0 14px}
+ul.check li{margin-bottom:6px}
+.why{font-size:15px;color:var(--ink-2)}
+#tip{position:fixed;pointer-events:none;z-index:10;background:var(--surface);color:var(--ink);border:1px solid var(--ring);box-shadow:0 4px 16px rgba(0,0,0,.12);border-radius:8px;padding:6px 10px;font-size:13px;opacity:0;transition:opacity .1s;max-width:240px}
+.hit{cursor:pointer}
+.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mapwrap svg{min-width:640px}
+.swipe{display:none;margin:4px 0}
+@media (max-width:680px){.swipe{display:block}}
+footer{padding:32px 0 64px;font-size:13px;color:var(--muted)}
+footer ol{padding-left:20px}
+footer a{color:var(--ink-2)}
+.themebtn{float:right;margin-top:-4px;font:inherit;font-size:13px;color:var(--ink-2);background:var(--surface);border:1px solid var(--ring);border-radius:999px;padding:4px 12px;cursor:pointer}
+@media (max-width:520px){section.lesson{padding:22px 16px}.flow .arrow{display:none}}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+<div class="wrap">
+<header class="hero">
+  <button class="themebtn" id="themebtn" type="button">Theme</button>
+  <p class="eyebrow">Study guide · Part 1: The principles</p>
+  <h1>How world events move stock prices</h1>
+  <p class="lede">Every headline reaches a stock price through a small number of channels. Learn the channels once, using real cases from 2008 to 2025, and the weekly news starts to make sense.</p>
+  <p class="note">For learning only. Not investment advice. Figures are taken from the sources listed at the bottom; illustrations that are calculations rather than market data are labeled as such.</p>
+  <nav class="toc" aria-label="Lessons">
+    <a href="#map">0 · The map</a><a href="#earnings">1 · Earnings</a><a href="#rates">2 · Interest rates</a>
+    <a href="#surprise">3 · Expectations</a><a href="#fx">4 · The yen</a><a href="#chain">5 · Chain reactions</a>
+    <a href="#shocks">6 · Shocks</a><a href="#sectors">7 · Sectors</a><a href="#politics">8 · Politics</a><a href="#weekly">How to read the news</a>
+  </nav>
+</header>
+
+<!-- 0 MAP -->
+<section class="lesson" id="map">
+  <span class="num">Lesson 0</span>
+  <h2>One formula, four channels</h2>
+  <p>A share price can be split into two parts: how much the company earns per share (<b>EPS</b>), and how much investors are willing to pay for each unit of those earnings (the <b>P/E ratio</b>).</p>
+  <div class="principle">Price = EPS × P/E. Every piece of news moves the price by changing one or both of these.</div>
+  <p>News almost never hits EPS or P/E directly. It travels through one of four channels: interest rates, the exchange rate, the economy and profit outlook, and risk appetite.</p>
+  <p class="note swipe">Swipe sideways to see the whole map →</p>
+  <div class="mapwrap"><svg id="mapsvg" viewBox="0 0 760 360" role="img" aria-label="Diagram: news flows through four channels into EPS and P/E, which together set the price."></svg></div>
+  <p class="why">Example: a strong US inflation report raises expected US interest rates (channel), which lowers the P/E investors will pay (driver), which lowers prices even if company earnings have not changed at all.</p>
+</section>
+
+<!-- 1 EARNINGS -->
+<section class="lesson" id="earnings">
+  <span class="num">Lesson 1</span>
+  <h2>Earnings: the EPS side</h2>
+  <div class="principle">Over the long run, prices follow profits. In the short run, what matters most is the outlook for future profits.</div>
+  <div class="case">
+    <span class="case-tag">Case · Nvidia · 24–25 May 2023</span>
+    <h3>A forecast moved the price more than the result</h3>
+    <p>Nvidia reported quarterly revenue of $7.19 billion, down 13% from a year earlier. On its own that was not exciting. But it also said next quarter's revenue would be about $11.0 billion, roughly 50% more, because demand for AI chips was surging. The shares jumped about 24–25% the next day and the company approached a $1 trillion market value.</p>
+    <p class="chart-title">Revenue: the quarter just reported vs. the next-quarter forecast</p>
+    <p class="chart-sub">US$ billions</p>
+    <div class="chart" id="c-nvda"></div>
+    <p class="why">Why: investors value a company on the profits they expect in the future. A big upgrade to the outlook raises expected EPS for years ahead, so the price reprices immediately.</p>
+  </div>
+</section>
+
+<!-- 2 RATES -->
+<section class="lesson" id="rates">
+  <span class="num">Lesson 2</span>
+  <h2>Interest rates: the P/E side</h2>
+  <div class="principle">When interest rates rise, the value of future profits falls today, so investors pay a lower P/E. Companies whose profits are far in the future are hit hardest.</div>
+  <p>Money received in the future is worth less than money today, and the higher the interest rate, the bigger the discount. A safe bond paying 5% also competes with stocks for investors' money.</p>
+  <p class="chart-title">How much value disappears when rates rise from 1% to 5%</p>
+  <p class="chart-sub">Fall in today's value of ¥100 received in year N. Illustration: pure calculation, not market data.</p>
+  <div class="chart" id="c-pv"></div>
+  <p class="why">Profits 20 years away lose about half their value; profits next year barely change. That is why fast-growing technology companies, whose value lies mostly in distant profits, fall the most when rates rise.</p>
+  <div class="case">
+    <span class="case-tag">Case · United States · 2022</span>
+    <h3>Seven rate hikes in one year</h3>
+    <p>To fight inflation, the US Federal Reserve raised its policy rate from 0–0.25% to 4.25–4.5% in seven steps during 2022.</p>
+    <p class="chart-title">Fed policy rate, upper bound, 2022</p>
+    <p class="chart-sub">Percent. Each step is one decision.</p>
+    <div class="chart" id="c-fed"></div>
+    <p class="chart-title">Index returns in 2022</p>
+    <p class="chart-sub">Percent change over the year (price only)</p>
+    <div class="chart" id="c-2022"></div>
+    <p class="why">The tech-heavy Nasdaq fell nearly four times as much as the Dow, which is weighted toward mature companies with steady current profits. Same rates, very different impact: exactly what the discounting chart above predicts.</p>
+  </div>
+</section>
+
+<!-- 3 SURPRISE -->
+<section class="lesson" id="surprise">
+  <span class="num">Lesson 3</span>
+  <h2>Expectations: prices react to surprises</h2>
+  <div class="principle">Markets move on the gap between what happened and what was expected. News that everyone expected is already "priced in".</div>
+  <div class="case">
+    <span class="case-tag">Case · US inflation report · 13 Sep 2022</span>
+    <h3>Good news that was not good enough</h3>
+    <div class="flow">
+      <div class="step"><b>Expected</b>Inflation slowing clearly</div><span class="arrow">→</span>
+      <div class="step"><b>Actual</b>8.3% a year; slower than June, but less than forecast</div><span class="arrow">→</span>
+      <div class="step"><b>Gap</b>More rate hikes now likely</div><span class="arrow">→</span>
+      <div class="step"><b>Reaction</b>S&amp;P 500 down more than 4%, Nasdaq more than 5% in one day</div>
+    </div>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · Bank of Japan · 19 Mar 2024</span>
+    <h3>A rate hike that weakened the yen</h3>
+    <div class="flow">
+      <div class="step"><b>Event</b>First rate hike in 17 years; end of negative rates</div><span class="arrow">→</span>
+      <div class="step"><b>Expected?</b>Yes, widely anticipated before the meeting</div><span class="arrow">→</span>
+      <div class="step"><b>Tone</b>Signals that policy stays easy; few hints of more hikes</div><span class="arrow">→</span>
+      <div class="step"><b>Reaction</b>Yen fell past ¥150 per dollar instead of rising</div>
+    </div>
+    <p class="why">Textbook logic says a rate hike strengthens the currency. But the hike was priced in, and the guidance was softer than feared. The surprise was "dovish", so the yen weakened. Always ask: compared with what was expected?</p>
+  </div>
+</section>
+
+<!-- 4 FX -->
+<section class="lesson" id="fx">
+  <span class="num">Lesson 4</span>
+  <h2>The yen: why it matters so much in Japan</h2>
+  <div class="principle">A weaker yen raises the yen value of overseas profits, so exporters' EPS goes up. A stronger yen does the opposite.</div>
+  <div class="case">
+    <span class="case-tag">Case · Toyota · forecast for the year to March 2026</span>
+    <h3>¥1 can mean ¥50 billion</h3>
+    <p>Toyota estimated that each ¥1 move against the dollar changes its operating profit by about ¥50 billion (plus about ¥10 billion per ¥1 against the euro). Its plan assumed ¥146 per dollar.</p>
+    <p class="chart-title">Rough change in Toyota operating profit if the yen weakens against the dollar</p>
+    <p class="chart-sub">¥ billions. Illustration: the company's stated sensitivity multiplied out; real results are not perfectly linear.</p>
+    <div class="chart" id="c-toyota"></div>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · Abenomics · 2013</span>
+    <h3>Policy, a weaker yen and a 57% year</h3>
+    <p>Massive monetary easing under Prime Minister Abe pushed the yen sharply weaker. The Nikkei 225 rose 57% in 2013, its biggest annual gain in more than 40 years, closing the year at 16,291.31.</p>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · Yen at a 32-year low · Oct 2022</span>
+    <h3>When the government steps in</h3>
+    <p>With US rates rising fast and Japan's held at zero, plus a record trade deficit from expensive energy imports, the dollar reached ¥151.90 on 21 Oct 2022. Japan's Ministry of Finance bought yen: about ¥3 trillion on 22 Sep and an estimated ¥5 trillion on 21 Oct. The yen briefly jumped to ¥144, but the effect faded within hours.</p>
+    <p class="why">Lesson: intervention can shock the market for a day, but it rarely reverses a trend driven by interest-rate gaps and trade flows.</p>
+  </div>
+</section>
+
+<!-- 5 CHAIN -->
+<section class="lesson" id="chain">
+  <span class="num">Lesson 5</span>
+  <h2>Chain reactions: when everyone exits at once</h2>
+  <div class="principle">Moves get extreme when many investors made the same leveraged bet and are forced to unwind it at the same time.</div>
+  <div class="case">
+    <span class="case-tag">Case · Japan · 31 Jul – 6 Aug 2024</span>
+    <h3>The biggest point drop in Nikkei history, then the biggest rise</h3>
+    <div class="flow">
+      <div class="step"><b>31 Jul</b>Bank of Japan raises rates and hints at more</div><span class="arrow">→</span>
+      <div class="step"><b>2 Aug</b>Weak US jobs report: US rate cuts now expected</div><span class="arrow">→</span>
+      <div class="step"><b>Rate gap narrows</b>Yen surges from ¥160s (early July) to about ¥144</div><span class="arrow">→</span>
+      <div class="step"><b>5 Aug</b>Exporters' EPS outlook cut, bets unwound: Nikkei −4,451</div>
+    </div>
+    <p>Many investors had borrowed cheap yen to buy higher-yielding assets (often called the "yen carry trade") or had bet on a weak yen. When the yen jumped, they had to sell quickly, which pushed prices down further and forced even more selling.</p>
+    <p class="chart-title">Largest daily moves in the Nikkei 225</p>
+    <p class="chart-sub">Percent change in one day</p>
+    <div class="chart" id="c-aug"></div>
+    <p class="why">The next day the index rose 3,217 points, a record gain, because nothing about Japanese companies' long-term earnings had changed that fast. Forced selling overshoots; the rebound shows it.</p>
+  </div>
+</section>
+
+<!-- 6 SHOCKS -->
+<section class="lesson" id="shocks">
+  <span class="num">Lesson 6</span>
+  <h2>Shocks and recoveries</h2>
+  <div class="principle">In a shock, investors first sell everything (risk appetite collapses, P/E falls). How fast prices recover depends on whether earnings are permanently damaged and how strongly governments respond.</div>
+  <p class="chart-title">Peak-to-bottom fall in the S&amp;P 500</p>
+  <p class="chart-sub">Percent</p>
+  <div class="chart" id="c-draw"></div>
+  <div class="tiles">
+    <div class="tile"><div class="v">17 months</div><div class="l">2008 financial crisis: 9 Oct 2007 → 9 Mar 2009. The banking system itself was damaged.</div></div>
+    <div class="tile"><div class="v">33 days</div><div class="l">COVID-19: 19 Feb → 23 Mar 2020, the shortest bear market on record.</div></div>
+    <div class="tile"><div class="v">+55%</div><div class="l">S&amp;P 500 rise in the five months after the March 2020 low, supported by trillions in stimulus.</div></div>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · US tariffs · April 2025</span>
+    <h3>A policy shock, and a policy reversal</h3>
+    <div class="flow">
+      <div class="step"><b>2 Apr</b>Steeper-than-expected tariffs announced</div><span class="arrow">→</span>
+      <div class="step"><b>3–4 Apr</b>About $5 trillion of S&amp;P 500 value lost in two days; China retaliates with 34%</div><span class="arrow">→</span>
+      <div class="step"><b>9 Apr</b>Tariffs paused: S&amp;P 500 +9.5%, one of its best days ever</div><span class="arrow">→</span>
+      <div class="step"><b>Mid-May</b>Index back to positive for the year</div>
+    </div>
+    <p class="why">A shock caused by a decision can be undone by another decision. That is why policy shocks often recover faster than shocks that destroy real earnings, such as 2008.</p>
+  </div>
+</section>
+
+<!-- 7 SECTORS -->
+<section class="lesson" id="sectors">
+  <span class="num">Lesson 7</span>
+  <h2>Sectors: the same news, opposite reactions</h2>
+  <div class="principle">News that hurts one industry can help another. Ask whose costs go up and whose revenues go up.</div>
+  <div class="case">
+    <span class="case-tag">Case · Energy · 2022</span>
+    <h3>Oil prices up, oil companies up</h3>
+    <p>After Russia invaded Ukraine, oil and gas prices soared. The same inflation that hurt most companies raised oil producers' profits. The S&amp;P 500 energy sector rose about 58%, the only sector that gained that year, while the index fell about 19%.</p>
+    <p class="chart-title">2022 return: energy sector vs. the whole market</p>
+    <p class="chart-sub">Percent</p>
+    <div class="chart" id="c-energy"></div>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · DeepSeek · 27 Jan 2025</span>
+    <h3>A threat to one story</h3>
+    <div class="tiles">
+      <div class="tile"><div class="v">−17%</div><div class="l">Nvidia share price in one day</div></div>
+      <div class="tile"><div class="v">$589 billion</div><div class="l">Market value lost, the largest one-day loss for any company in history</div></div>
+    </div>
+    <p class="why">A Chinese AI model suggested that powerful AI might need far fewer expensive chips. That questioned the expected future EPS of chipmakers specifically, so the hit was concentrated in one sector rather than the whole market.</p>
+  </div>
+</section>
+
+<!-- 8 POLITICS -->
+<section class="lesson" id="politics">
+  <span class="num">Lesson 8</span>
+  <h2>Politics and policy expectations</h2>
+  <div class="principle">Markets price what they expect a government to do: spending, taxes, regulation, and pressure on the central bank.</div>
+  <p class="chart-title">Nikkei 225 milestones, 1989–2025</p>
+  <p class="chart-sub">Closing level on six selected days, in date order. Spacing is not to scale in time, and the path between the days is not shown.</p>
+  <div class="chart" id="c-nikkei"></div>
+  <div class="case">
+    <span class="case-tag">Case · Japan · Oct 2025</span>
+    <h3>The "Takaichi trade"</h3>
+    <p>After Sanae Takaichi won the leadership of the ruling LDP in early October 2025, investors bet on more growth-oriented policy. On 6 Oct the Nikkei rose 2,175 points to a record 47,944, led by defense and semiconductor stocks. On 27 Oct it closed above 50,000 for the first time (50,512.32), helped also by easing US–China trade fears and strong chip-company results.</p>
+  </div>
+  <div class="case">
+    <span class="case-tag">Case · Japan · 22 Feb 2024</span>
+    <h3>34 years to beat the bubble peak</h3>
+    <p>The Nikkei closed at 39,098.68, finally above the 29 Dec 1989 record of 38,915.87. The trigger that day was strong Nvidia results lifting Japanese chip-equipment makers, with the yen near ¥150 supporting exporters.</p>
+  </div>
+</section>
+
+<!-- WEEKLY -->
+<section class="lesson" id="weekly">
+  <span class="num">Using it every week</span>
+  <h2>Five questions for any headline</h2>
+  <ul class="check">
+    <li><b>Which channel?</b> Interest rates, the yen, the economy and profits, or risk appetite?</li>
+    <li><b>EPS or P/E?</b> Does it change future profits, or what investors will pay for them?</li>
+    <li><b>Versus what was expected?</b> Look for the forecast, not just the number.</li>
+    <li><b>Who was crowded into one bet?</b> Crowded, borrowed positions turn small news into big moves.</li>
+    <li><b>Who wins, who loses?</b> Exporters vs. importers, energy vs. users of energy, growth vs. mature companies.</li>
+  </ul>
+  <p class="note">Coming next: a weekly log that applies these five questions to that week's biggest market moves.</p>
+</section>
+
+<footer>
+  <p><b>Sources</b></p>
+  <ol>
+    <li><a href="https://investor.nvidia.com/news/press-release-details/2023/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2024/default.aspx">Nvidia, Q1 FY2024 results (May 2023)</a></li>
+    <li><a href="https://www.fool.com.au/2023/05/25/nvidia-share-price-leaps-25-lifting-us-futures/">Motley Fool, Nvidia share price leaps 25% (May 2023)</a></li>
+    <li><a href="https://www.ksl.com/article/50548249/sp-500-closes-out-dismal-year-with-worst-loss-since-2008">AP via KSL, S&amp;P 500 closes out worst year since 2008 (Dec 2022)</a></li>
+    <li><a href="https://www.weku.org/local-news/local-news/2022-09-13/stocks-plummet-dow-drops-nearly-1-300-points-after-worrying-inflation-data">WEKU, stocks plummet after inflation data (13 Sep 2022)</a></li>
+    <li><a href="https://www.freemalaysiatoday.com/category/business/2024/03/19/yen-slides-past-%c2%a5150-per-dollar-wide-yield-gap-with-us">Bloomberg via FMT, yen slides past ¥150 after BOJ (19 Mar 2024)</a></li>
+    <li><a href="https://www.sbbit.jp/article/refers/136191">SBBIT, BOJ ends negative rates (Mar 2024)</a></li>
+    <li><a href="https://newswitch.jp/p/47809">Newswitch, Toyota currency sensitivity (FY to Mar 2026)</a></li>
+    <li><a href="https://www.nbcnews.com/business/economy/japans-nikkei-closes-out-2013-57-percent-n1261">NBC News, Nikkei closes out 2013 up 57%</a></li>
+    <li><a href="https://www.businessinsider.jp/article/261020/">Business Insider Japan, yen at 32-year low and interventions (Oct 2022)</a></li>
+    <li><a href="https://go.sbisec.co.jp/media/report/ma_flash/ma_flash_240805.html">SBI Securities, Nikkei −4,451 on 5 Aug 2024</a></li>
+    <li><a href="https://business.inquirer.net/?p=473335">Inquirer, Nikkei closes up 10.2% on 6 Aug 2024</a></li>
+    <li><a href="https://www.businessinsider.jp/article/291645/">Business Insider Japan, yen near ¥144 on 5 Aug 2024</a></li>
+    <li><a href="https://www.atlantafed.org/cenfis/publications/notesfromthevault/0909">Atlanta Fed, stock prices in the financial crisis</a></li>
+    <li><a href="https://www.investing.com/news/stock-market-news/say-goodbye-to-the-shortest-bear-market-in-sp-500-history-2270085">Reuters via Investing.com, shortest bear market in S&amp;P 500 history (Aug 2020)</a></li>
+    <li><a href="https://theedgemalaysia.com/node/750240">Reuters via The Edge, S&amp;P 500 loses $5 trillion in two days (Apr 2025)</a></li>
+    <li><a href="https://finance.yahoo.com/news/p-500-recovered-losses-215247252.html">Yahoo Finance, how the S&amp;P 500 recovered its losses for the year (May 2025)</a></li>
+    <li><a href="https://www.foxbusiness.com/markets/sp-energy-sectors-record-2022-performance-built-downfall-others">Fox Business, energy sector's record 2022</a></li>
+    <li><a href="https://www.bloomberg.com/news/articles/2025-01-27/asml-sinks-as-china-ai-startup-triggers-panic-in-tech-stocks">Bloomberg, Nvidia's $589 billion DeepSeek rout (Jan 2025)</a></li>
+    <li><a href="https://www.oanda.jp/lab-education/market_news/mn_979126_202510061753/">OANDA, Nikkei +2,175 on 6 Oct 2025</a></li>
+    <li><a href="https://www.sakigake.jp/news/article/20251027CO0064/">Kyodo via Sakigake, Nikkei closes above 50,000 (27 Oct 2025)</a></li>
+    <li><a href="https://www.sbbit.jp/article/refers/134325">SBBIT, Nikkei beats 1989 record (22 Feb 2024)</a></li>
+  </ol>
+  <p>Fed 2022 decision dates: Mar 16, May 4, Jun 15, Jul 27, Sep 21, Nov 2, Dec 14 (25, 50, 75, 75, 75, 75, 50 basis points). Black Monday 1987 Nikkei fall of 14.9% as cited by SBI Securities.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  /* ---------- theme toggle ---------- */
+  var root=document.documentElement, btn=document.getElementById('themebtn');
+  try{var saved=localStorage.getItem('theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  btn.addEventListener('click',function(){
+    var dark = root.getAttribute('data-theme')==='dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    var next = dark?'light':'dark'; root.setAttribute('data-theme',next);
+    try{localStorage.setItem('theme',next);}catch(e){}
+  });
+
+  /* ---------- tooltip ---------- */
+  var tip=document.getElementById('tip');
+  function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
+  function moveTip(e){
+    var x=(e.touches?e.touches[0].clientX:e.clientX), y=(e.touches?e.touches[0].clientY:e.clientY);
+    var w=tip.offsetWidth; var left=Math.min(window.innerWidth-w-8, x+12);
+    tip.style.left=Math.max(8,left)+'px'; tip.style.top=(y+14)+'px';
+  }
+  function hideTip(){tip.style.opacity=0;}
+  function bindTip(el,html){
+    el.classList.add('hit');
+    el.addEventListener('mouseenter',function(e){showTip(e,html)});
+    el.addEventListener('mousemove',moveTip);
+    el.addEventListener('mouseleave',hideTip);
+    el.addEventListener('touchstart',function(e){showTip(e,html)},{passive:true});
+  }
+  document.addEventListener('touchstart',function(e){if(!e.target.closest('.hit'))hideTip();},{passive:true});
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(name,attrs,parent){var n=document.createElementNS(NS,name);for(var k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
+  function txt(parent,x,y,s,attrs){var t=el('text',Object.assign({x:x,y:y,'font-size':12,fill:'var(--ink-2)'},attrs||{}),parent);t.textContent=s;return t;}
+  function fmt(v,d){return (v>0?'+':v<0?'−':'')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+  function addTable(host,head,rows){
+    var d=document.createElement('details');d.className='table';
+    var h='<summary>Show data table</summary><table><tr>'+head.map(function(x){return '<th>'+x+'</th>'}).join('')+'</tr>';
+    rows.forEach(function(r){h+='<tr>'+r.map(function(x){return '<td>'+x+'</td>'}).join('')+'</tr>'});
+    d.innerHTML=h+'</table>';host.appendChild(d);
+  }
+  function roundedBar(g,x,y,w,h,up,color){
+    /* bar with 4px rounded data end; anchored square at baseline */
+    var r=Math.min(4,Math.abs(h),w/2), d;
+    if(h<=0) return el('rect',{x:x,y:y,width:w,height:0},g);
+    if(up){ d='M'+x+','+(y+h)+'V'+(y+r)+'Q'+x+','+y+' '+(x+r)+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h)+'Z'; }
+    else { d='M'+x+','+y+'V'+(y+h-r)+'Q'+x+','+(y+h)+' '+(x+r)+','+(y+h)+'H'+(x+w-r)+'Q'+(x+w)+','+(y+h)+' '+(x+w)+','+(y+h-r)+'V'+y+'Z'; }
+    return el('path',{d:d,fill:color},g);
+  }
+
+  /* ---------- horizontal bar chart (handles negatives, diverging colors) ---------- */
+  function hbar(id,data,opt){
+    var host=document.getElementById(id); opt=opt||{};
+    var W=Math.max(300,host.clientWidth||760), narrow=W<560;
+    var rowH=narrow?58:40,labW=narrow?6:(opt.labW||210),padR=narrow?62:70,padL=narrow?0:10,top=6;
+    var H=top+data.length*rowH+24;
+    var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':opt.aria||''},host);
+    var vals=data.map(function(d){return d.v});
+    var min=Math.min(0,Math.min.apply(null,vals)), max=Math.max(0,Math.max.apply(null,vals));
+    if(opt.min!==undefined)min=opt.min; if(opt.max!==undefined)max=opt.max;
+    var x0=narrow?(min<0?54:4):labW, x1=W-padR, sx=function(v){return x0+(v-min)/(max-min)*(x1-x0)};
+    // grid
+    (opt.ticks||[]).forEach(function(t){
+      el('line',{x1:sx(t),x2:sx(t),y1:top,y2:H-22,stroke:'var(--grid)','stroke-width':1},svg);
+      txt(svg,sx(t),H-6,(opt.tickFmt?opt.tickFmt(t):t),{'text-anchor':'middle',fill:'var(--muted)','font-size':11});
+    });
+    el('line',{x1:sx(0),x2:sx(0),y1:top,y2:H-22,stroke:'var(--axis)','stroke-width':1.5},svg);
+    data.forEach(function(d,i){
+      var y=top+i*rowH+(narrow?26:8), bh=narrow?22:24, color=d.c||(d.v<0?'var(--down)':(opt.color||'var(--up)'));
+      if(narrow) txt(svg,0,y-8,d.l,{'font-size':13,fill:'var(--ink)'}); else txt(svg,padL,y+bh/2+4,d.l,{'font-size':13,fill:'var(--ink)'});
+      var g=el('g',{},svg);
+      var xa=sx(Math.min(0,d.v)), xb=sx(Math.max(0,d.v)), w=Math.max(1,xb-xa);
+      // horizontal bar: rounded at the data end
+      var r=Math.min(4,w/2), p;
+      if(d.v>=0) p='M'+xa+','+y+'H'+(xb-r)+'Q'+xb+','+y+' '+xb+','+(y+r)+'V'+(y+bh-r)+'Q'+xb+','+(y+bh)+' '+(xb-r)+','+(y+bh)+'H'+xa+'Z';
+      else p='M'+xb+','+y+'H'+(xa+r)+'Q'+xa+','+y+' '+xa+','+(y+r)+'V'+(y+bh-r)+'Q'+xa+','+(y+bh)+' '+(xa+r)+','+(y+bh)+'H'+xb+'Z';
+      el('path',{d:p,fill:color},g);
+      var lab=opt.valFmt?opt.valFmt(d.v):fmt(d.v,opt.dec);
+      var lx=d.v>=0?xb+6:xa-6;
+      txt(svg,lx,y+bh/2+4,lab,{'text-anchor':d.v>=0?'start':'end',fill:'var(--ink)','font-size':13,'font-weight':600});
+      var hitR=el('rect',{x:0,y:y-(narrow?24:6),width:W,height:bh+(narrow?30:12),fill:'transparent'},svg);
+      bindTip(hitR,'<b>'+d.l+'</b><br>'+(d.tip||lab));
+    });
+    addTable(host,opt.head||['Item','Value'],data.map(function(d){return [d.l,opt.valFmt?opt.valFmt(d.v):fmt(d.v,opt.dec)]}));
+  }
+
+  /* ---------- step chart for the Fed ---------- */
+  function fedChart(){
+    var host=document.getElementById('c-fed');
+    var pts=[['Jan 1',0.25,''],['Mar 16',0.50,'+0.25'],['May 4',1.00,'+0.50'],['Jun 15',1.75,'+0.75'],['Jul 27',2.50,'+0.75'],['Sep 21',3.25,'+0.75'],['Nov 2',4.00,'+0.75'],['Dec 14',4.50,'+0.50']];
+    var days=[0,74,123,165,207,263,305,347], end=364;
+    var W=Math.max(300,host.clientWidth||760),H=240,L=40,R=12,T=12,B=30;
+    var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Step chart: Fed upper bound rose from 0.25% to 4.50% during 2022.'},host);
+    var sx=function(d){return L+d/end*(W-L-R)}, sy=function(v){return T+(1-v/5)*(H-T-B)};
+    [0,1,2,3,4,5].forEach(function(t){
+      el('line',{x1:L,x2:W-R,y1:sy(t),y2:sy(t),stroke:t===0?'var(--axis)':'var(--grid)','stroke-width':1},svg);
+      txt(svg,L-8,sy(t)+4,t+'%',{'text-anchor':'end',fill:'var(--muted)','font-size':11});
+    });
+    ['Jan','Apr','Jul','Oct','Dec'].forEach(function(m,i){var d=[0,90,181,273,334][i];txt(svg,sx(d),H-8,m,{'text-anchor':'middle',fill:'var(--muted)','font-size':11});});
+    var path='M'+sx(0)+','+sy(pts[0][1]);
+    for(var i=1;i<pts.length;i++){path+='H'+sx(days[i])+'V'+sy(pts[i][1]);}
+    path+='H'+sx(end);
+    el('path',{d:path,fill:'none',stroke:'var(--s1)','stroke-width':2,'stroke-linejoin':'round'},svg);
+    pts.forEach(function(p,i){
+      if(i===0)return;
+      var cx=sx(days[i]),cy=sy(p[1]);
+      el('circle',{cx:cx,cy:cy,r:4.5,fill:'var(--s1)',stroke:'var(--surface)','stroke-width':2},svg);
+      var h=el('circle',{cx:cx,cy:cy,r:16,fill:'transparent'},svg);
+      bindTip(h,'<b>'+p[0]+', 2022</b><br>Hike '+p[2]+' pt → upper bound '+p[1].toFixed(2)+'%');
+    });
+    txt(svg,sx(end)-2,sy(4.5)-10,'4.50%',{'text-anchor':'end',fill:'var(--ink)','font-weight':600,'font-size':13});
+    txt(svg,sx(0)+4,sy(0.25)-8,'0.25%',{fill:'var(--ink)','font-weight':600,'font-size':13});
+    addTable(host,['Decision date (2022)','Change','Upper bound'],pts.slice(1).map(function(p){return [p[0],p[2]+' pt',p[1].toFixed(2)+'%']}));
+  }
+
+  /* ---------- vertical bars (single series, positive) ---------- */
+  function vbar(id,data,opt){
+    var host=document.getElementById(id);
+    var W=Math.max(300,host.clientWidth||760),H=opt.H||220,L=W<560?48:56,R=8,T=24,B=44;
+    var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':opt.aria||''},host);
+    var max=opt.max, sy=function(v){return T+(1-v/max)*(H-T-B)};
+    opt.ticks.forEach(function(t){
+      el('line',{x1:L,x2:W-R,y1:sy(t),y2:sy(t),stroke:t===0?'var(--axis)':'var(--grid)','stroke-width':1},svg);
+      txt(svg,L-8,sy(t)+4,opt.tickFmt?opt.tickFmt(t):t,{'text-anchor':'end',fill:'var(--muted)','font-size':11});
+    });
+    var n=data.length, band=(W-L-R)/n, bw=Math.min(72,band*0.42);
+    data.forEach(function(d,i){
+      var cx=L+band*(i+.5), x=cx-bw/2, y=sy(d.v), h=sy(0)-y;
+      roundedBar(svg,x,y,bw,h,true,d.c||'var(--s1)');
+      txt(svg,cx,y-8,opt.valFmt(d.v),{'text-anchor':'middle',fill:'var(--ink)','font-weight':600,'font-size':13});
+      txt(svg,cx,H-B+18,d.l,{'text-anchor':'middle',fill:'var(--ink-2)','font-size':12});
+      if(d.l2) txt(svg,cx,H-B+34,d.l2,{'text-anchor':'middle',fill:'var(--muted)','font-size':11});
+      var hr=el('rect',{x:cx-band/2+4,y:T,width:band-8,height:H-T-B,fill:'transparent'},svg);
+      bindTip(hr,'<b>'+d.l+(d.l2?' '+d.l2:'')+'</b><br>'+(d.tip||opt.valFmt(d.v)));
+    });
+    addTable(host,opt.head,data.map(function(d){return [d.l+(d.l2?' '+d.l2:''),opt.valFmt(d.v)]}));
+  }
+
+  /* ---------- Nikkei milestone dot chart (time-proportional x) ---------- */
+  function nikkei(){
+    var host=document.getElementById('c-nikkei');
+    var d=[
+      ['1989-12-29',38915.87,'Bubble-era record close','29 Dec 1989'],
+      ['2013-12-30',16291.31,'End of 2013 (+57% for the year)','30 Dec 2013'],
+      ['2024-02-22',39098.68,'Beats the 1989 record','22 Feb 2024'],
+      ['2024-08-05',31458.42,'Record point drop (−4,451)','5 Aug 2024'],
+      ['2025-10-06',47944,'"Takaichi trade" (+2,175)','6 Oct 2025'],
+      ['2025-10-27',50512.32,'First close above 50,000','27 Oct 2025']
+    ];
+    var W=Math.max(300,host.clientWidth||760),H=300,L=36,R=8,T=24,B=40;
+    var band=(W-L-R)/d.length, sx=function(i){return L+band*(i+.5)};
+    var sy=function(v){return T+(1-v/60000)*(H-T-B)};
+    var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Dot chart of Nikkei 225 closing levels on six milestone days from 1989 to 2025.'},host);
+    [0,10000,20000,30000,40000,50000,60000].forEach(function(t){
+      el('line',{x1:L,x2:W-R,y1:sy(t),y2:sy(t),stroke:t===0?'var(--axis)':'var(--grid)','stroke-width':1},svg);
+      txt(svg,L-8,sy(t)+4,(t/1000)+'k',{'text-anchor':'end',fill:'var(--muted)','font-size':11});
+    });
+    el('line',{x1:L,x2:W-R,y1:sy(38915.87),y2:sy(38915.87),stroke:'var(--muted)','stroke-width':1,'stroke-dasharray':'4 4'},svg);
+    txt(svg,W-R,sy(38915.87)-6,'1989 record: 38,915.87',{'text-anchor':'end',fill:'var(--muted)','font-size':11});
+    d.forEach(function(p,i){
+      var cx=sx(i),cy=sy(p[1]);
+      txt(svg,cx,H-B+18,p[3].replace(/ \d{4}$/,''),{'text-anchor':'middle',fill:'var(--ink-2)','font-size':11});
+      txt(svg,cx,H-B+32,p[3].slice(-4),{'text-anchor':'middle',fill:'var(--muted)','font-size':11});
+      el('circle',{cx:cx,cy:cy,r:5.5,fill:'var(--s1)',stroke:'var(--surface)','stroke-width':2},svg);
+      var above = i!==3;
+      txt(svg,cx,cy+(above?-12:20),Math.round(p[1]).toLocaleString('en-US'),{'text-anchor':'middle',fill:'var(--ink)','font-weight':600,'font-size':12});
+      var h=el('rect',{x:cx-band/2+4,y:T,width:band-8,height:H-T-B,fill:'transparent'},svg);
+      bindTip(h,'<b>'+p[3]+'</b><br>'+p[1].toLocaleString('en-US',{maximumFractionDigits:2})+'<br>'+p[2]);
+    });
+    addTable(host,['Date','Close','Event'],d.map(function(p){return [p[3],p[1].toLocaleString('en-US',{maximumFractionDigits:2}),p[2]]}));
+  }
+
+  /* ---------- Lesson 0 map ---------- */
+  function map(){
+    var svg=document.getElementById('mapsvg');
+    var defs=el('defs',{},svg), m=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);
+    el('path',{d:'M0,0 L10,5 L0,10 z',fill:'var(--muted)'},m);
+    function box(x,y,w,h,label,opt){
+      opt=opt||{};
+      el('rect',{x:x,y:y,width:w,height:h,rx:10,fill:opt.fill||'var(--page)',stroke:opt.stroke||'var(--ring)','stroke-width':opt.sw||1},svg);
+      var lines=label.split('\n');
+      lines.forEach(function(s,i){txt(svg,x+w/2,y+h/2+4+(i-(lines.length-1)/2)*16,s,{'text-anchor':'middle',fill:'var(--ink)','font-size':opt.fs||13,'font-weight':opt.fw||400});});
+      return {x:x,y:y,w:w,h:h,cy:y+h/2};
+    }
+    txt(svg,95,14,'NEWS',{'text-anchor':'middle',fill:'var(--muted)','font-size':11,'letter-spacing':'.08em'});
+    txt(svg,330,14,'CHANNEL',{'text-anchor':'middle',fill:'var(--muted)','font-size':11,'letter-spacing':'.08em'});
+    txt(svg,540,14,'DRIVER',{'text-anchor':'middle',fill:'var(--muted)','font-size':11,'letter-spacing':'.08em'});
+    txt(svg,695,14,'RESULT',{'text-anchor':'middle',fill:'var(--muted)','font-size':11,'letter-spacing':'.08em'});
+    var news=['Central bank decisions','Inflation & jobs data','Company earnings','Currency moves','Politics & policy','Shocks (war, virus, tech)'];
+    var N=news.map(function(s,i){return box(20,28+i*54,150,38,s,{fs:12})});
+    var C=[box(250,40,160,44,'Interest rates',{fw:600}),box(250,118,160,44,'Exchange rate (¥ vs $)',{fw:600}),box(250,196,160,44,'Economy & profit outlook',{fw:600}),box(250,274,160,44,'Risk appetite',{fw:600})];
+    var D=[box(480,82,120,60,'EPS\n(earnings)',{fw:700,stroke:'var(--s1)',sw:2}),box(480,220,120,60,'P/E\n(valuation)',{fw:700,stroke:'var(--s2)',sw:2})];
+    var P=box(650,146,90,64,'Price',{fw:700,fs:15,stroke:'var(--ink-2)',sw:2});
+    function link(a,b,dashed,label){
+      var x1=a.x+a.w,y1=a.cy,x2=b.x-2,y2=b.cy,mx=(x1+x2)/2;
+      var p=el('path',{d:'M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2,fill:'none',stroke:'var(--muted)','stroke-width':1.5,'marker-end':'url(#ah)'},svg);
+      if(dashed)p.setAttribute('stroke-dasharray','4 4');
+      return p;
+    }
+    [[0,0],[1,0],[2,2],[3,1],[4,2],[4,3],[5,3],[5,2]].forEach(function(e){link(N[e[0]],C[e[1]])});
+    link(C[0],D[1]); link(C[1],D[0]); link(C[2],D[0]); link(C[3],D[1]);
+    link(D[0],P); link(D[1],P);
+    // rates -> exchange rate (rate gap)
+    el('path',{d:'M'+(C[0].x+C[0].w-20)+','+(C[0].y+C[0].h)+' V'+(C[1].y-2),fill:'none',stroke:'var(--muted)','stroke-width':1.5,'stroke-dasharray':'4 4','marker-end':'url(#ah)'},svg);
+    txt(svg,C[0].x+C[0].w-28,C[0].y+C[0].h+20,'rate gap',{'text-anchor':'end',fill:'var(--muted)','font-size':11});
+    txt(svg,695,236,'= EPS × P/E',{'text-anchor':'middle',fill:'var(--ink-2)','font-size':13});
+    var tips=[
+      [C[0],'Higher rates lower the value of future profits, so P/E falls. Lesson 2.'],
+      [C[1],'A weaker yen lifts exporters’ profits in yen. The gap between US and Japanese rates moves the yen. Lessons 4–5.'],
+      [C[2],'Demand, costs and company guidance change expected earnings. Lessons 1 and 7.'],
+      [C[3],'Fear makes investors pay less for the same earnings; forced selling exaggerates it. Lessons 5–6.']
+    ];
+    tips.forEach(function(t){var r=el('rect',{x:t[0].x,y:t[0].y,width:t[0].w,height:t[0].h,fill:'transparent'},svg);bindTip(r,t[1]);});
+  }
+
+  /* ---------- build ---------- */
+  map();
+  function render(){
+  ['c-nvda','c-pv','c-fed','c-2022','c-toyota','c-aug','c-draw','c-energy','c-nikkei'].forEach(function(id){document.getElementById(id).innerHTML='';});
+  vbar('c-nvda',[
+    {l:'Q1 FY2024',l2:'(reported)',v:7.19,c:'var(--s1)'},
+    {l:'Q2 FY2024',l2:'(company forecast)',v:11.0,c:'var(--s2)',tip:'$11.0 billion, plus or minus 2%'}
+  ],{max:12,ticks:[0,3,6,9,12],tickFmt:function(t){return '$'+t+'B'},valFmt:function(v){return '$'+v.toFixed(2)+'B'},head:['Quarter','Revenue'],aria:'Bar chart: Q1 revenue $7.19 billion vs Q2 forecast $11.0 billion.'});
+  var years=[1,5,10,20], pv=years.map(function(n){var a=100/Math.pow(1.01,n),b=100/Math.pow(1.05,n);return {l:'Profit in year '+n,v:-(1-b/a)*100,tip:'Value today: ¥'+a.toFixed(1)+' at 1% → ¥'+b.toFixed(1)+' at 5%'}});
+  hbar('c-pv',pv,{min:-60,max:0,ticks:[-60,-40,-20,0],tickFmt:function(t){return t+'%'},valFmt:function(v){return fmt(v,0)+'%'},head:['Timing','Change in value today'],aria:'Bar chart: rising rates from 1% to 5% cut the present value of profits more the further away they are.'});
+  fedChart();
+  hbar('c-2022',[
+    {l:'Dow Jones',v:-8.8},{l:'S&P 500',v:-19.4},{l:'Nasdaq Composite',v:-33.1}
+  ],{min:-40,max:0,ticks:[-40,-30,-20,-10,0],tickFmt:function(t){return t+'%'},dec:1,valFmt:function(v){return fmt(v,1)+'%'},head:['Index','2022 change'],aria:'Bar chart of 2022 index returns.'});
+  vbar('c-toyota',[1,5,10,20].map(function(n){return {l:'¥'+n+' weaker',v:n*50,tip:'≈ ¥'+(n*50)+' billion (¥50 billion × '+n+')'}}),
+    {max:1000,ticks:[0,250,500,750,1000],tickFmt:function(t){return '¥'+t+'B'},valFmt:function(v){return '+¥'+v+'B'},head:['Yen move','Operating profit change (approx.)'],aria:'Bar chart: Toyota operating profit sensitivity to the dollar-yen rate.'});
+  hbar('c-aug',[
+    {l:'20 Oct 1987 (Black Monday)',v:-14.9},
+    {l:'5 Aug 2024',v:-12.4,tip:'−4,451.28 points, the largest point drop on record; close ≈ 31,458'},
+    {l:'6 Aug 2024',v:10.2,tip:'+3,217.04 points, the largest point gain on record; close 34,675.46'}
+  ],{min:-20,max:12,ticks:[-15,-10,-5,0,5,10],tickFmt:function(t){return t+'%'},dec:1,valFmt:function(v){return fmt(v,1)+'%'},labW:220,head:['Day','Nikkei change'],aria:'Bar chart of record Nikkei daily moves.'});
+  hbar('c-draw',[
+    {l:'2008 financial crisis',v:-56.8,tip:'9 Oct 2007 → 9 Mar 2009 (17 months)'},
+    {l:'COVID-19 crash',v:-34,tip:'19 Feb → 23 Mar 2020 (33 days)'}
+  ],{min:-60,max:0,ticks:[-60,-40,-20,0],tickFmt:function(t){return t+'%'},dec:1,valFmt:function(v){return fmt(v,v%1?1:0)+'%'},head:['Episode','Peak to bottom'],aria:'Bar chart of S&P 500 drawdowns.'});
+  hbar('c-energy',[
+    {l:'S&P 500 energy sector',v:58,tip:'About +58%, the only sector to gain in 2022'},
+    {l:'S&P 500 (whole index)',v:-19.4}
+  ],{min:-30,max:70,ticks:[-20,0,20,40,60],tickFmt:function(t){return t+'%'},valFmt:function(v){return (v===58?'≈ +58':fmt(v,1))+'%'},head:['Group','2022 change'],aria:'Bar chart: energy sector +58% vs S&P 500 −19.4% in 2022.'});
+  nikkei();
+  }
+  render();
+  var lastW=window.innerWidth, rt;
+  window.addEventListener('resize',function(){if(window.innerWidth===lastW)return;lastW=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,150);});
+})();
+</script>
+</body>
+</html>

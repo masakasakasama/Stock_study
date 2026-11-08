@@ -1,0 +1,76 @@
+{
+  "title": "How world events move stock prices",
+  "framework": {
+    "formula": "Price = EPS x P/E",
+    "channels": ["Interest rates", "Exchange rate (JPY vs USD)", "Economy & profit outlook", "Risk appetite"],
+    "drivers": { "EPS": ["Exchange rate", "Economy & profit outlook"], "P/E": ["Interest rates", "Risk appetite"] },
+    "links": [["Interest rates", "Exchange rate", "rate gap"]]
+  },
+  "lessons": [
+    {
+      "id": "earnings", "priority": 1, "principle": "Over the long run prices follow profits; in the short run the outlook for future profits matters most.",
+      "cases": [{ "name": "Nvidia guidance", "date": "2023-05-24/25",
+        "data": { "q1_fy2024_revenue_usd_bn": 7.19, "q1_yoy_pct": -13, "q2_fy2024_guidance_usd_bn": 11.0, "next_day_move_pct": "about +24 to +25" },
+        "sources": ["https://investor.nvidia.com/news/press-release-details/2023/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2024/default.aspx", "https://www.fool.com.au/2023/05/25/nvidia-share-price-leaps-25-lifting-us-futures/"] }]
+    },
+    {
+      "id": "rates", "priority": 1, "principle": "Higher rates lower the present value of future profits, so P/E falls; long-duration growth stocks fall most.",
+      "illustration": { "present_value_drop_1pct_to_5pct": { "year1": -3.8, "year5": -17.6, "year10": -32.2, "year20": -54.0 }, "note": "calculation, not market data" },
+      "cases": [{ "name": "Fed hikes 2022", "date": "2022",
+        "data": { "fed_upper_bound_path": [["2022-03-16", 0.50], ["2022-05-04", 1.00], ["2022-06-15", 1.75], ["2022-07-27", 2.50], ["2022-09-21", 3.25], ["2022-11-02", 4.00], ["2022-12-14", 4.50]],
+          "index_2022_pct": { "Dow": -8.8, "S&P 500": -19.4, "Nasdaq": -33.1 } },
+        "sources": ["https://www.ksl.com/article/50548249/sp-500-closes-out-dismal-year-with-worst-loss-since-2008"] }]
+    },
+    {
+      "id": "expectations", "priority": 2, "principle": "Prices move on the gap between outcome and expectation; expected news is priced in.",
+      "cases": [
+        { "name": "US CPI surprise", "date": "2022-09-13", "data": { "cpi_yoy_pct": 8.3, "sp500_day": "down more than 4%", "nasdaq_day": "down more than 5%" },
+          "sources": ["https://www.weku.org/local-news/local-news/2022-09-13/stocks-plummet-dow-drops-nearly-1-300-points-after-worrying-inflation-data"] },
+        { "name": "BOJ ends negative rates, yen weakens", "date": "2024-03-19", "data": { "usdjpy_intraday_high": 150.38, "first_hike_in_years": 17 },
+          "sources": ["https://www.freemalaysiatoday.com/category/business/2024/03/19/yen-slides-past-%c2%a5150-per-dollar-wide-yield-gap-with-us", "https://www.sbbit.jp/article/refers/136191"] }
+      ]
+    },
+    {
+      "id": "fx", "priority": 2, "principle": "A weaker yen raises exporters' EPS in yen terms; a stronger yen lowers it.",
+      "cases": [
+        { "name": "Toyota FX sensitivity", "period": "FY to March 2026", "data": { "op_profit_per_1yen_usd_jpy_bn": 50, "op_profit_per_1yen_eur_jpy_bn": 10, "assumed_usdjpy": 146 }, "sources": ["https://newswitch.jp/p/47809"] },
+        { "name": "Abenomics", "date": "2013", "data": { "nikkei_2013_pct": 57, "nikkei_close_2013": 16291.31 }, "sources": ["https://www.nbcnews.com/business/economy/japans-nikkei-closes-out-2013-57-percent-n1261"] },
+        { "name": "Yen 32-year low and intervention", "date": "2022-10-21", "data": { "usdjpy_high": 151.90, "intervention_2022_09_22_jpy_tn": 3, "intervention_2022_10_21_jpy_tn_est": 5, "post_intervention_low": 144 }, "sources": ["https://www.businessinsider.jp/article/261020/"] }
+      ]
+    },
+    {
+      "id": "chain", "priority": 1, "principle": "Extreme moves come from crowded, leveraged positions being unwound at once.",
+      "cases": [{ "name": "Japan crash and rebound", "date": "2024-07-31/08-06",
+        "timeline": [["2024-07-31", "BOJ rate hike"], ["2024-08-02", "Weak US jobs report"], ["2024-08-05", "Nikkei -4,451.28 (-12.4%), yen near 144"], ["2024-08-06", "Nikkei +3,217.04 (+10.23%) to 34,675.46"]],
+        "data": { "black_monday_1987_pct": -14.9 },
+        "sources": ["https://go.sbisec.co.jp/media/report/ma_flash/ma_flash_240805.html", "https://business.inquirer.net/?p=473335", "https://www.businessinsider.jp/article/291645/"] }]
+    },
+    {
+      "id": "shocks", "priority": 2, "principle": "Shocks crush P/E first; recovery speed depends on lasting earnings damage and policy response.",
+      "cases": [
+        { "name": "Global financial crisis", "data": { "sp500_peak_to_trough_pct": -56.8, "peak": "2007-10-09", "trough": "2009-03-09" }, "sources": ["https://www.atlantafed.org/cenfis/publications/notesfromthevault/0909"] },
+        { "name": "COVID crash", "data": { "sp500_drop_pct": -34, "days": 33, "rebound_5_months_pct": 55 }, "sources": ["https://www.investing.com/news/stock-market-news/say-goodbye-to-the-shortest-bear-market-in-sp-500-history-2270085"] },
+        { "name": "US tariffs", "date": "2025-04", "data": { "sp500_value_lost_2_days_usd_tn": 5, "sp500_2025_04_04_pct": -5.97, "china_retaliation_pct": 34, "sp500_2025_04_09_pct": 9.5 },
+          "sources": ["https://theedgemalaysia.com/node/750240", "https://finance.yahoo.com/news/p-500-recovered-losses-215247252.html"] }
+      ]
+    },
+    {
+      "id": "sectors", "priority": 3, "principle": "The same news helps some industries and hurts others.",
+      "cases": [
+        { "name": "Energy in 2022", "data": { "energy_sector_pct_approx": 58, "sp500_pct": -19.4 }, "sources": ["https://www.foxbusiness.com/markets/sp-energy-sectors-record-2022-performance-built-downfall-others"] },
+        { "name": "DeepSeek", "date": "2025-01-27", "data": { "nvidia_day_pct": -17, "market_value_lost_usd_bn": 589 }, "sources": ["https://www.bloomberg.com/news/articles/2025-01-27/asml-sinks-as-china-ai-startup-triggers-panic-in-tech-stocks"] }
+      ]
+    },
+    {
+      "id": "politics", "priority": 3, "principle": "Markets price expected government policy.",
+      "cases": [
+        { "name": "Nikkei beats 1989 record", "date": "2024-02-22", "data": { "close": 39098.68, "record_1989_12_29": 38915.87 }, "sources": ["https://www.sbbit.jp/article/refers/134325"] },
+        { "name": "Takaichi trade", "date": "2025-10", "data": { "nikkei_2025_10_06_close": 47944, "nikkei_2025_10_06_gain": 2175, "nikkei_2025_10_27_close": 50512.32 },
+          "sources": ["https://www.oanda.jp/lab-education/market_news/mn_979126_202510061753/", "https://www.sakigake.jp/news/article/20251027CO0064/"] }
+      ]
+    }
+  ],
+  "weekly_questions": [
+    "Which channel?", "EPS or P/E?", "Versus what was expected?", "Who was crowded into one bet?", "Who wins, who loses?"
+  ]
+}
